@@ -1,10 +1,22 @@
 <script setup>
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+// Retrieve the logged-in user's data from localStorage
+const username = ref('');
 const router = useRouter();
+
+onMounted(() => {
+  // Fetch username from localStorage if the user is logged in
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user) {
+    username.value = user.username;
+  }
+});
 
 const logout = () => {
   localStorage.removeItem('auth');
+  localStorage.removeItem('user');
   router.push('/');
 };
 </script>
@@ -14,13 +26,12 @@ const logout = () => {
     <h1>Dukani</h1>
     <div class="dropdown">
       <button class="dropdown-toggle">
-        <!-- src="https://via.placeholder.com/40" -->
         <img
           src="/home/ahmed/Documents/vue-projects/vue-2/src/assets/icon2.jpg"
           alt="User Icon"
           class="user-icon"
         />
-        <span class="user-name">User</span>
+        <span class="user-name">{{ username }}</span>
       </button>
       <div class="dropdown-menu">
         <a href="#">Profile</a>
@@ -36,11 +47,11 @@ const logout = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #2c3e50; /* Matches sidebar */
+  background-color: #2c3e50;
   color: white;
   padding: 10px 20px;
-  width: calc(100% - 300px); /* Accounts for sidebar width */
-  margin-left: 300px; /* Adjust for sidebar positioning */
+  width: calc(100% - 300px);
+  margin-left: 300px;
 }
 
 .dropdown {

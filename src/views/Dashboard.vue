@@ -42,7 +42,7 @@ onMounted(() => {
   <div class="dashboard-container">
     <!-- Time and Day -->
     <div class="card time-day-card">
-      <p><strong>{{ currentFormattedDate }}</strong> - {{ currentFormattedTime }}</p>
+      <p><strong>{{ currentFormattedDate }}</strong> <br>{{ currentFormattedTime }}</p>
     </div>
 
     <!-- Welcome Message -->

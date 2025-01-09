@@ -14,13 +14,30 @@ const validateForm = () => {
   return !usernameError.value && !passwordError.value;
 };
 
-const handleSubmit = () => {
-  if (username.value === 'admin' && password.value === 'admin123') {
-    localStorage.setItem('auth', 'true'); // Simulate authentication
-    router.push('/layout'); // Redirect to the main layout
-  } else {
-    usernameError.value = true;
-    passwordError.value = true;
+const handleSubmit = async () => {
+  if (validateForm()) {
+    try {
+      const response = await fetch('http://localhost:8080/vue-api/users/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.value, password: password.value }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('auth', 'true');
+        localStorage.setItem('user', JSON.stringify({ username: username.value }));
+        router.push('/layout');
+      } else {
+        usernameError.value = true;
+        passwordError.value = true;
+        alert(data.error || 'Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Login request failed:', error);
+      alert('An error occurred. Please try again later.');
+    }
   }
 };
 </script>

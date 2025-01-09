@@ -6,19 +6,36 @@ const router = useRouter();
 
 const transactions = ref([
   {
-    id: 1, totalAmount: 20.0, date: '2025-01-02', paymentStatus: 'Paid', soldBy: 'Admin',
-    products: [{ name: 'Coke 500ml', quantity: 2, price: 1.5 }, { name: 'Dettol Soap', quantity: 1, price: 2.0 },
-      { name: 'Petroleum Jelly', quantity: 1, price: 3.0 }, { name: 'Tissue Paper', quantity: 3, price: 1.2 }]
+    id: 1, totalAmount: 9000, date: '2025-01-02', paymentStatus: 'Paid', soldBy: 'Admin',
+    products: [
+      { name: 'Coke 500ml', quantity: 2, price: 1000 },
+      { name: 'Dettol Soap', quantity: 1, price: 2000 },
+      { name: 'Petroleum Jelly', quantity: 1, price: 2500 },
+      { name: 'Tissue Paper', quantity: 3, price: 1500 }
+    ]
   },
   {
-    id: 2, totalAmount: 35.0, date: '2025-01-03', paymentStatus: 'Pending', soldBy: 'Cashier 1',
-    products: [{ name: 'Dettol Soap', quantity: 3, price: 2.0 }, { name: 'Colgate 400g', quantity: 2, price: 3.0 },
-      { name: 'Coke 500ml', quantity: 1, price: 1.5 }]
+    id: 2, totalAmount: 12000, date: '2025-01-03', paymentStatus: 'Pending', soldBy: 'Cashier 1',
+    products: [
+      { name: 'Dettol Soap', quantity: 3, price: 2000 },
+      { name: 'Colgate 400g', quantity: 2, price: 2500 },
+      { name: 'Coke 500ml', quantity: 1, price: 1000 }
+    ]
   },
   {
-    id: 3, totalAmount: 35.0, date: '2025-01-03', paymentStatus: 'Failed', soldBy: 'Cashier 1',
-    products: [{ name: 'Dettol Soap', quantity: 3, price: 2.0 }, { name: 'Colgate 400g', quantity: 2, price: 3.0 },
-      { name: 'Coke 500ml', quantity: 1, price: 1.5 }]
+    id: 3, totalAmount: 13500, date: '2024-01-01', paymentStatus: 'Paid', soldBy: 'Admin',
+    products: [
+      { name: 'Dettol Soap', quantity: 1, price: 2000 },
+      { name: 'Petroleum Jelly', quantity: 1, price: 2500 },
+      { name: 'Tissue Paper', quantity: 3, price: 1500 }
+    ]
+  },
+  {
+    id: 4, totalAmount: 5000, date: '2023-01-03', paymentStatus: 'Failed', soldBy: 'Cashier 2',
+    products: [
+      { name: 'Milk 1L', quantity: 2, price: 1800 },
+      { name: 'Bread', quantity: 1, price: 1500 }
+    ]
   }
 ]);
 
@@ -46,7 +63,6 @@ const goToTransactionPage = () => {
   router.push('/sales');
 };
 
-// Accordion functionality
 const toggleAccordion = (transactionId) => {
   const transaction = transactions.value.find(t => t.id === transactionId);
   if (transaction) {
@@ -54,13 +70,8 @@ const toggleAccordion = (transactionId) => {
   }
 };
 
-// Initialize `isOpen` for each transaction
-transactions.value.forEach(transaction => {
-  transaction.isOpen = false;
-});
-
 const paymentStatusClass = (status) => {
-  switch (status.toUpperCase()) {
+  switch (status.toLowerCase()) {
     case 'paid':
       return 'paid';
     case 'pending':
@@ -71,18 +82,20 @@ const paymentStatusClass = (status) => {
       return '';
   }
 };
+
+transactions.value.forEach(transaction => {
+  transaction.isOpen = false;
+});
 </script>
 
 <template>
   <div class="transaction-list">
     <h3>Transaction History</h3>
 
-    <!-- Button to do transaction -->
     <div class="transaction-button">
       <button @click="goToTransactionPage" class="do-transaction-btn">Do Transaction</button>
     </div>
 
-    <!-- Search Input for Date -->
     <div class="search-container">
       <input 
         type="text" 
@@ -92,12 +105,11 @@ const paymentStatusClass = (status) => {
       />
     </div>
 
-    <!-- Transaction Table -->
     <table>
       <thead>
         <tr>
           <th>Transaction Date</th>
-          <th>Total Amount</th>
+          <th>Total Amount(tsh.)</th>
           <th>Payment Status</th>
           <th>Sold By</th>
           <th>Products</th>
@@ -106,29 +118,24 @@ const paymentStatusClass = (status) => {
       <tbody>
         <tr v-for="transaction in paginatedTransactions" :key="transaction.id">
           <td>{{ transaction.date }}</td>
-          <td>${{ transaction.totalAmount.toFixed(2) }}</td>
-
-          <!-- Payment Status with Color Change -->
+          <td>{{ transaction.totalAmount.toFixed(2) }}</td>
           <td :class="paymentStatusClass(transaction.paymentStatus)">
             {{ transaction.paymentStatus.toLowerCase() }}
           </td>
-
           <td>{{ transaction.soldBy }}</td>
           <td>
             <div>
-              <!-- Show only one product initially -->
               <div v-for="(product, index) in transaction.products.slice(0, 1)" :key="index">
-                {{ product.name }} x {{ product.quantity }} - ${{ (product.price * product.quantity).toFixed(2) }}
+                {{ product.name }} x {{ product.quantity }} - {{ (product.price * product.quantity).toFixed(2) }}
               </div>
 
-              <!-- Show more products with an accordion -->
               <div v-if="transaction.products.length > 1">
                 <button class="accordion-btn" @click="toggleAccordion(transaction.id)">
-                  Show More
+                  {{ transaction.isOpen ? 'Show Less' : 'Show More' }}
                 </button>
                 <div v-if="transaction.isOpen">
                   <div v-for="(product, index) in transaction.products.slice(1)" :key="index">
-                    {{ product.name }} x {{ product.quantity }} - ${{ (product.price * product.quantity).toFixed(2) }}
+                    {{ product.name }} x {{ product.quantity }} - {{ (product.price * product.quantity).toFixed(2) }}
                   </div>
                 </div>
               </div>
@@ -138,19 +145,10 @@ const paymentStatusClass = (status) => {
       </tbody>
     </table>
 
-    <!-- Pagination Controls -->
     <div class="pagination">
-      <button 
-        @click="currentPage > 1 && currentPage--" 
-        :disabled="currentPage === 1">
-        Previous
-      </button>
+      <button @click="currentPage > 1 && currentPage--" :disabled="currentPage === 1">Previous</button>
       <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button 
-        @click="currentPage < totalPages && currentPage++" 
-        :disabled="currentPage === totalPages">
-        Next
-      </button>
+      <button @click="currentPage < totalPages && currentPage++" :disabled="currentPage === totalPages">Next</button>
     </div>
   </div>
 </template>
@@ -178,8 +176,9 @@ const paymentStatusClass = (status) => {
 }
 
 .do-transaction-btn:hover {
-  background-color: #0056b3;
+  background-color: #0866ca;
 }
+
 
 .search-container {
   margin-bottom: 20px;
@@ -193,6 +192,7 @@ const paymentStatusClass = (status) => {
   font-size: 1rem;
 }
 
+/* Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -200,24 +200,14 @@ table {
 }
 
 th, td {
-  padding: 3px;
+  padding: 8px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
 
 th {
-  background-color: #f1f1f1;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  background-color: #f9f9f9;
-  margin: 5px 0;
-  /* padding: 5px; */
+  background-color: #34495e;
+  color: white;
 }
 
 .pagination {
@@ -244,9 +234,8 @@ li {
   font-size: 1rem;
 }
 
-/* Accordion button styling */
 .accordion-btn {
-  background-color: #3498db;
+  background-color: #1abc9c;
   color: white;
   padding: 5px 15px;
   border: none;
@@ -255,22 +244,38 @@ li {
 }
 
 .accordion-btn:hover {
-  background-color: #2980b9;
+  background-color: #0eaa8b;
 }
 
-/* Payment status colors */
+.paid, .pending, .failed {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 .paid {
   color: #27ae60;
 }
 
 .pending {
-  background-color: #f39c12;
-  color: white;
+  color: #f39c12;
 }
 
 .failed {
-  background-color: #e74c3c;
-  color: white;
+  color: #e74c3c;
 }
-</style>
 
+div[role="button"] {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+div[role="button"] button {
+  margin-top: 10px;
+}
+
+td > div {
+  margin-top: 10px;
+}
+
+</style>

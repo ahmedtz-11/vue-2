@@ -1,14 +1,14 @@
+import Sales from '@/views/sales/Sales.vue';
+import Stock from '@/views/stock/Stock.vue';
+import TransactionList from '@/views/sales/TransactionList.vue';
+import Users from '@/views/Users.vue';
+import AddStock from '@/views/stock/AddStock.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginForm from '../components/entities/LoginForm.vue';
-import Dashboard from '../components/entities/Dashboard.vue';
-import Layout from '/home/ahmed/Documents/vue-projects/vue-2/src/components/Layout/Layout.vue'
-import Products from '/home/ahmed/Documents/vue-projects/vue-2/src/components/entities/Products.vue'
-import Stock from '@/components/entities/Stock.vue';
-import AddProduct from '/home/ahmed/Documents/vue-projects/vue-2/src/components/entities/AddProduct.vue';
-import Sales from '@/components/entities/Sales.vue';
-import AddStock from '@/components/entities/AddStock.vue';
-import Users from '@/components/entities/Users.vue';
-import TransactionList from '@/components/entities/TransactionList.vue';
+import AddProduct from '../views/product/AddProduct.vue';
+import Dashboard from '../views/Dashboard.vue';
+import LoginForm from '../views/LoginForm.vue';
+import Layout from '../components/Layout.vue';
+import Products from '../views/product/Products.vue';
 
 const routes = [
   {
@@ -22,7 +22,12 @@ const routes = [
       { path: '', component: Dashboard },
       { path: '/products', component: Products },
       { path: '/stocks', component: Stock },
-      { path: '/add-product', component: AddProduct },
+      {
+        path: '/add-product/:id?',
+        name: 'AddProduct',
+        component: AddProduct,
+        props: true, // Allows passing route params as props
+      },      
       { path: '/sales', component: Sales },
       { path: '/add-stock', component: AddStock },
       { path: '/users', component: Users },

@@ -1,12 +1,25 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const isAdmin = ref(false); // To store if the logged-in user is an admin
+
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  
+  if (user && user.username === 'admin') {
+    isAdmin.value = true; // Set isAdmin to true if the user is an admin
+  }
+});
+</script>
+
 <template>
   <aside class="sidebar">
-    
     <ul>
       <li><router-link to="/layout">Dashboard</router-link></li>
       <li><router-link to="/products">Products</router-link></li>
       <li><router-link to="/stocks">Stock</router-link></li>
       <li><router-link to="/sales">Sales</router-link></li>
-      <li><router-link to="/users">Users</router-link></li>
+      <li v-if="isAdmin"><router-link to="/users">Users</router-link></li>
     </ul>
     
     <div class="company-footer">

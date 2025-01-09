@@ -217,7 +217,7 @@ const viewTransactions = () => {
 }
 
 .selected-products table th {
-  background-color: #007bff;
+  background-color: #34495e;
   color: white;
 }
 
