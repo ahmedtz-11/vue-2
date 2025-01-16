@@ -1,43 +1,40 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useProductStore } from '@/stores/product';
 
 const router = useRouter();
 const route = useRoute();
+const productStore = useProductStore();
 
 const name = ref('');
 const category = ref('');
 const price = ref('');
 const description = ref('');
 const status = ref('');
-
-const categories = ref(['Food', 'Drinks', 'Cosmetics', 'Diary', 'Cleaning', 'Detergent']);
+const categories = ref([]);
 const statuses = ref(['Available', 'Not Available']);
 
+// Get categories and fetch product when editing
+onMounted(async () => {
+  categories.value = await productStore.fetchCategories();
 
-const loadProduct = async (id) => {
-  try {
-    const response = await fetch(`http://localhost:8080/vue-api/products/getSingleProduct.php?id=${id}`);
-    const product = await response.json();
-    name.value = product.name;
-    category.value = product.category;
-    price.value = product.price;
-    description.value = product.description;
-    status.value = product.status;
-  } catch (error) {
-    console.error('Error loading product:', error);
-  }
-};
-
-onMounted(() => {
   if (route.params.id) {
-    loadProduct(route.params.id);
+    await productStore.fetchProductById(route.params.id);
+    const product = productStore.currentProduct;
+    if (product) {
+      name.value = product.name;
+      category.value = product.category;
+      price.value = product.price;
+      description.value = product.description;
+      status.value = product.status;
+    }
   }
 });
 
 const saveProduct = async () => {
   const productData = {
-    id: route.params.id, // Use this for updates
+    id: route.params.id, // Use this when you edit
     name: name.value,
     category: category.value,
     price: price.value,
@@ -45,35 +42,13 @@ const saveProduct = async () => {
     status: status.value,
   };
 
-  const endpoint = route.params.id
-    ? 'http://localhost:8080/vue-api/products/updateProduct.php'
-    : 'http://localhost:8080/vue-api/products/addProduct.php';
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(productData),
-    });
-
-    const result = await response.json();
-    if (result.message) {
-      alert(result.message);
-      router.push('/products');
-    } else {
-      alert(result.error);
-    }
-  } catch (error) {
-    console.error('Error saving product:', error);
-  }
+  await productStore.saveProduct(productData);
+  router.push('/products');
 };
 
 const back = () => {
   router.push('/products');
-}
-
+};
 </script>
 
 <template>
@@ -103,7 +78,7 @@ const back = () => {
             required
           >
             <option value="" disabled>Select a category</option>
-            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+            <option v-for="cat in categories" :key="cat.id" :value="cat.category">{{ cat.category }}</option>
           </select>
         </div>
 
@@ -133,28 +108,24 @@ const back = () => {
 
         <!-- Description -->
         <div class="form-group">
-        <label for="description">Description</label>
-        <textarea
-          id="description"
-          class="form-control"
-          v-model="description"
-          rows="1"
-          placeholder="write anything about product...."
-          required
-        ></textarea>
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            class="form-control"
+            v-model="description"
+            rows="1"
+            placeholder="Write anything about product..."
+            required
+          ></textarea>
         </div>
       </div>
-      
 
       <div class="form-row">
-        <button type="submit" class="btn btn-warning" @click="back">Cancel</button>
-
-          <!-- Add/Update Button -->
+        <button type="button" class="btn btn-warning" @click="back">Cancel</button>
         <button type="submit" class="btn btn-primary">
-              {{ route.params.id ? 'Save Changes' : 'Add Product' }}
+          {{ route.params.id ? 'Save Changes' : 'Add Product' }}
         </button>
       </div>
-
     </form>
   </div>
 </template>

@@ -1,89 +1,76 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useSalesStore } from '@/stores/sales';
 import { useRouter } from 'vue-router';
 
+const salesStore = useSalesStore();
 const router = useRouter();
-
-const transactions = ref([
-  {
-    id: 1, totalAmount: 9000, date: '2025-01-02', paymentStatus: 'Paid', soldBy: 'Admin',
-    products: [
-      { name: 'Coke 500ml', quantity: 2, price: 1000 },
-      { name: 'Dettol Soap', quantity: 1, price: 2000 },
-      { name: 'Petroleum Jelly', quantity: 1, price: 2500 },
-      { name: 'Tissue Paper', quantity: 3, price: 1500 }
-    ]
-  },
-  {
-    id: 2, totalAmount: 12000, date: '2025-01-03', paymentStatus: 'Pending', soldBy: 'Cashier 1',
-    products: [
-      { name: 'Dettol Soap', quantity: 3, price: 2000 },
-      { name: 'Colgate 400g', quantity: 2, price: 2500 },
-      { name: 'Coke 500ml', quantity: 1, price: 1000 }
-    ]
-  },
-  {
-    id: 3, totalAmount: 13500, date: '2024-01-01', paymentStatus: 'Paid', soldBy: 'Admin',
-    products: [
-      { name: 'Dettol Soap', quantity: 1, price: 2000 },
-      { name: 'Petroleum Jelly', quantity: 1, price: 2500 },
-      { name: 'Tissue Paper', quantity: 3, price: 1500 }
-    ]
-  },
-  {
-    id: 4, totalAmount: 5000, date: '2023-01-03', paymentStatus: 'Failed', soldBy: 'Cashier 2',
-    products: [
-      { name: 'Milk 1L', quantity: 2, price: 1800 },
-      { name: 'Bread', quantity: 1, price: 1500 }
-    ]
-  }
-]);
 
 const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 15;
 
+
+onMounted(() => {
+  salesStore.fetchTransactions();
+});
+
+
+
+// Filtered transactions based on search query
 const filteredTransactions = computed(() => {
-  return transactions.value.filter(transaction => 
-    transaction.date.includes(searchQuery.value)
+  const transactions = Array.isArray(salesStore.transactions)
+    ? salesStore.transactions
+    : Object.values(salesStore.transactions); // Convert object to array
+
+  return transactions.filter(transaction =>
+    transaction.transaction_date.includes(searchQuery.value)
   );
 });
 
+
+
+// Paginate filtered transactions
 const paginatedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return filteredTransactions.value.slice(start, end);
 });
 
+// Total pages for pagination
 const totalPages = computed(() => {
   return Math.ceil(filteredTransactions.value.length / itemsPerPage);
 });
 
+// Redirect to transaction page
 const goToTransactionPage = () => {
   router.push('/sales');
 };
 
+// Toggle product list accordion
 const toggleAccordion = (transactionId) => {
-  const transaction = transactions.value.find(t => t.id === transactionId);
+  const transaction = salesStore.transactions.find(t => t.transaction_id === transactionId);
   if (transaction) {
     transaction.isOpen = !transaction.isOpen;
   }
 };
 
+// Style classes for payment status
 const paymentStatusClass = (status) => {
   switch (status.toLowerCase()) {
     case 'paid':
       return 'paid';
     case 'pending':
       return 'pending';
-    case 'failed':
-      return 'failed';
+    case 'cancelled':
+      return 'cancelled';
     default:
       return '';
   }
 };
 
-transactions.value.forEach(transaction => {
+// Ensure transactions have the `isOpen` property
+salesStore.transactions.forEach(transaction => {
   transaction.isOpen = false;
 });
 </script>
@@ -109,33 +96,35 @@ transactions.value.forEach(transaction => {
       <thead>
         <tr>
           <th>Transaction Date</th>
-          <th>Total Amount(tsh.)</th>
+          <th>Total Amount (tsh.)</th>
           <th>Payment Status</th>
           <th>Sold By</th>
           <th>Products</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="transaction in paginatedTransactions" :key="transaction.id">
-          <td>{{ transaction.date }}</td>
-          <td>{{ transaction.totalAmount.toFixed(2) }}</td>
-          <td :class="paymentStatusClass(transaction.paymentStatus)">
-            {{ transaction.paymentStatus.toLowerCase() }}
+        <tr v-for="transaction in paginatedTransactions" :key="transaction.transaction_id">
+          <td>{{ transaction.transaction_date }}</td>
+          <td>{{ parseFloat(transaction.total_amount).toFixed(2) }}</td>
+          <td :class="paymentStatusClass(transaction.payment_status)">
+            {{ transaction.payment_status.toLowerCase() }}
           </td>
-          <td>{{ transaction.soldBy }}</td>
+          <td>{{ transaction.sold_by }}</td>
           <td>
             <div>
-              <div v-for="(product, index) in transaction.products.slice(0, 1)" :key="index">
-                {{ product.name }} x {{ product.quantity }} - {{ (product.price * product.quantity).toFixed(2) }}
+              <div v-for="(product, index) in transaction.details.slice(0, 1)" :key="index">
+                {{ product.product_name }} x {{ product.quantity }} - 
+                {{ (parseFloat(product.unit_price) * product.quantity).toFixed(2) }}
               </div>
 
-              <div v-if="transaction.products.length > 1">
-                <button class="accordion-btn" @click="toggleAccordion(transaction.id)">
+              <div v-if="transaction.details.length > 1">
+                <button class="accordion-btn" @click="toggleAccordion(transaction.transaction_id)">
                   {{ transaction.isOpen ? 'Show Less' : 'Show More' }}
                 </button>
                 <div v-if="transaction.isOpen">
-                  <div v-for="(product, index) in transaction.products.slice(1)" :key="index">
-                    {{ product.name }} x {{ product.quantity }} - {{ (product.price * product.quantity).toFixed(2) }}
+                  <div v-for="(product, index) in transaction.details.slice(1)" :key="index">
+                    {{ product.product_name }} x {{ product.quantity }} - 
+                    {{ (parseFloat(product.unit_price) * product.quantity).toFixed(2) }}
                   </div>
                 </div>
               </div>
@@ -159,6 +148,7 @@ transactions.value.forEach(transaction => {
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
+  height: 100vh;
 }
 
 .transaction-button {
@@ -247,7 +237,7 @@ th {
   background-color: #0eaa8b;
 }
 
-.paid, .pending, .failed {
+.paid, .pending, .cancelled {
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -260,7 +250,7 @@ th {
   color: #f39c12;
 }
 
-.failed {
+.cancelled {
   color: #e74c3c;
 }
 

@@ -1,14 +1,14 @@
-import Sales from '@/views/sales/Sales.vue';
-import Stock from '@/views/stock/Stock.vue';
-import TransactionList from '@/views/sales/TransactionList.vue';
+import Sales from '@/views/Sales.vue';
+import Stock from '@/views/Stock.vue';
+import TransactionList from '@/views/TransactionList.vue';
 import Users from '@/views/Users.vue';
-import AddStock from '@/views/stock/AddStock.vue';
+import AddStock from '@/views/AddStock.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import AddProduct from '../views/product/AddProduct.vue';
+import AddProduct from '../views/AddProduct.vue';
 import Dashboard from '../views/Dashboard.vue';
 import LoginForm from '../views/LoginForm.vue';
 import Layout from '../components/Layout.vue';
-import Products from '../views/product/Products.vue';
+import Products from '../views/Products.vue';
 
 const routes = [
   {

@@ -1,17 +1,13 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/user.js';
 
-// Retrieve the logged-in user's data from localStorage
-const username = ref('');
+const userStore = useUserStore();
 const router = useRouter();
 
 onMounted(() => {
-  // Fetch username from localStorage if the user is logged in
-  const user = JSON.parse(localStorage.getItem('user'));
-  if (user) {
-    username.value = user.username;
-  }
+  userStore.fetchLoggedInUser();
 });
 
 const logout = () => {
@@ -31,7 +27,7 @@ const logout = () => {
           alt="User Icon"
           class="user-icon"
         />
-        <span class="user-name">{{ username }}</span>
+        <span class="user-name">{{ userStore.username }}</span>
       </button>
       <div class="dropdown-menu">
         <a href="#">Profile</a>

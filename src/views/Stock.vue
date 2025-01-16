@@ -1,59 +1,20 @@
 <script setup>
-import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStockStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/stock.js';
 
-const searchQuery = ref('');
+const stockStore = useStockStore();
 const router = useRouter();
-const stocks = ref([]);
 const currentPage = ref(1);
-const pageSize = 5; //items per page
-
-const fetchStocks = async () => {
-  try {
-    const response = await fetch('http://localhost:8080/vue-api/stocks/getStocks.php');
-    const data = await response.json();
-
-    if (data.success && Array.isArray(data.stocks)) {
-      stocks.value = data.stocks;
-    } else {
-      console.error('API returned unexpected structure or success flag is false:', data);
-    }
-  } catch (error) {
-    console.error('Error fetching stocks:', error);
-  }
-};
-
-const filteredStocks = computed(() => {
-  if (!searchQuery.value) return stocks.value;
-  return stocks.value.filter((stock) =>
-    stock.product_name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+const pageSize = 5;
 
 const paginatedStocks = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   const end = start + pageSize;
-  return filteredStocks.value.slice(start, end);
+  return stockStore.filteredStocks.slice(start, end);
 });
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredStocks.value.length / pageSize);
-});
-
-const pageNumbers = computed(() => {
-  const total = totalPages.value;
-  const current = currentPage.value;
-  const range = [];
-
-  const start = Math.max(1, current - 1);
-  const end = Math.min(total, current + 1);
-
-  for (let i = start; i <= end; i++) {
-    range.push(i);
-  }
-
-  return range;
-});
+const totalPages = computed(() => Math.ceil(stockStore.filteredStocks.length / pageSize));
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
@@ -65,36 +26,16 @@ const addNewStock = () => {
   router.push('/add-stock');
 };
 
-
 const deleteStock = async (id) => {
   const confirmDelete = confirm('Are you sure you want to delete this stock?');
-  if (!confirmDelete) return;
-
-  try {
-    const response = await fetch('http://localhost:8080/vue-api/stocks/deleteStock.php', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      stocks.value = stocks.value.filter((stock) => stock.id !== id);
-      alert('Stock deleted successfully!');
-    } else {
-      alert(result.error || 'Failed to delete stock');
-    }
-  } catch (error) {
-    console.error('Error deleting stock:', error);
+  if (confirmDelete) {
+    await stockStore.deleteStock(id);
   }
 };
 
-
-const editStock = (id) => {
-  alert(`Edit stock with ID: ${id}`);
-};
-
-onMounted(fetchStocks);
+onMounted(() => {
+  stockStore.fetchStocks();
+});
 </script>
 
 <template>
@@ -105,7 +46,7 @@ onMounted(fetchStocks);
         type="text"
         class="search-box"
         placeholder="Search stock..."
-        v-model="searchQuery"
+        v-model="stockStore.searchQuery"
       />
       <button class="btn btn-primary" @click="addNewStock">Add New Stock</button>
     </div>
@@ -172,6 +113,7 @@ onMounted(fetchStocks);
   border-radius: 8px;
   border: 1px solid #ddd;
   background-color: #f9f9f9;
+  height: 100vh;
 }
 
 .header {
@@ -205,6 +147,7 @@ onMounted(fetchStocks);
 .stock-table th {
   background-color: #2c3e50;
   color: white;
+  font-weight: bolder;
 }
 
 .stock-table tr:hover {
@@ -267,5 +210,6 @@ onMounted(fetchStocks);
 
 .pagination .btn:hover {
   background-color: #f0f0f0;
+  color: #007bff;
 }
 </style>

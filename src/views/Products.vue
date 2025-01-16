@@ -1,37 +1,21 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
+import { useProductStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/product.js';
 
-const products = ref([]);
-const searchQuery = ref('');
+const productStore = useProductStore();
 const currentPage = ref(1);
 const itemsPerPage = ref(8);
 const router = useRouter();
 
-const fetchProducts = async () => {
-  try {
-    const response = await fetch('http://localhost:8080/vue-api/products/getProducts.php');
-    products.value = await response.json();
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-};
-onMounted(fetchProducts);
-
-const filteredProducts = computed(() => {
-  if (!searchQuery.value) return products.value;
-  return products.value.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
-
 const paginatedProducts = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return filteredProducts.value.slice(start, end);
+  return productStore.filteredProducts.slice(start, end);
 });
 
-const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+
+const totalPages = computed(() => Math.ceil(productStore.filteredProducts.length / itemsPerPage.value));
 
 const addNewProduct = () => {
   router.push('/add-product');
@@ -39,26 +23,7 @@ const addNewProduct = () => {
 
 const confirmDelete = (id) => {
   if (confirm('Are you sure you want to delete this product?')) {
-    deleteProduct(id);
-  }
-};
-
-const deleteProduct = async (id) => {
-  try {
-    const response = await fetch(`http://localhost:8080/vue-api/products/deleteProduct.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    const result = await response.json();
-    if (result.success) {
-      alert(result.message);
-      fetchProducts();
-    } else {
-      alert(result.error);
-    }
-  } catch (error) {
-    console.error('Error deleting product:', error);
+    productStore.deleteProduct(id);
   }
 };
 
@@ -82,6 +47,11 @@ const changePage = (page) => {
     currentPage.value = page;
   }
 };
+
+onMounted(async () => {
+  await productStore.fetchProducts();
+});
+
 </script>
 
 <template>
@@ -92,7 +62,7 @@ const changePage = (page) => {
         type="text"
         class="search-box"
         placeholder="Search products..."
-        v-model="searchQuery"
+        v-model="productStore.searchQuery"
       />
       <button class="btn btn-primary" @click="addNewProduct">Add New Product</button>
     </div>
@@ -103,6 +73,7 @@ const changePage = (page) => {
           <th>ID.</th>
           <th>Name</th>
           <th>Description</th>
+          <th>Category</th>
           <th>Status</th>
           <th>Price</th>
           <th>Actions</th>
@@ -113,39 +84,31 @@ const changePage = (page) => {
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
           <td>{{ product.description }}</td>
+          <td>{{ product.category }}</td>
           <td :class="productStatusClass(product.status)">{{ product.status }}</td>
           <td>{{ product.price }}</td>
           <td>
             <button class="btn btn-success btn-sm" @click="updateProduct(product.id)">
-              Update
+              Edit
             </button>
             <button class="btn btn-danger btn-sm" @click="confirmDelete(product.id)">
               Delete
             </button>
           </td>
         </tr>
-        <tr v-if="filteredProducts.length === 0">
-          <td colspan="5" class="no-results">No products found.</td>
+        <tr v-if="productStore.filteredProducts.length === 0">
+          <td colspan="7" class="no-results">No products found.</td>
         </tr>
       </tbody>
     </table>
 
     <div class="pagination">
       <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)">Previous</button>
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        :class="{ active: currentPage === page }"
-        @click="changePage(page)"
-      >
-        {{ page }}
-      </button>
-      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">
-        Next
-      </button>
+      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">Next</button>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .products-container {
@@ -153,6 +116,7 @@ const changePage = (page) => {
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
+  height: 100vh;
 }
 
 .header {
@@ -228,9 +192,10 @@ const changePage = (page) => {
 }
 
 .btn-success {
-  background-color: #28a745;
-  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  color: #28a745;
   margin-right: 5px;
+  border: 1px solid #28a745;
 }
 
 .btn-success:hover {
@@ -238,8 +203,9 @@ const changePage = (page) => {
 }
 
 .btn-danger {
-  background-color: #dc3545;
-  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  color: #dc3545;
+  border: 1px solid #dc3545;
 }
 
 .btn-danger:hover {
@@ -254,17 +220,19 @@ const changePage = (page) => {
 }
 .pagination button {
   padding: 5px 10px;
-  border: 1px solid #ccc;
+  border: none;
   background: #f5f5f5;
   cursor: pointer;
   border-radius: 6px;
 }
-.pagination button.active {
-  background: #007bff;
-  color: white;
+
+.pagination button:hover {
+  background-color: #f0f0f0;
+  color: #007bff;
 }
-.pagination button:disabled {
-  background: #ddd;
-  cursor: not-allowed;
+
+.pagination button.active:hover {
+  background-color: #f0f0f0;
+  color: #007bff;
 }
 </style>

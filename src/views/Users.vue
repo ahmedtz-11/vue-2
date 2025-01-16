@@ -141,12 +141,16 @@ fetchUsers();
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
+  height: 100vh;
 }
 
 .user-form {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 #uname {
