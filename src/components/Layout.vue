@@ -4,32 +4,29 @@ import Sidebar from './Sidebar.vue';
 </script>
 
 <template>
-    <div class="layout">
-      <Navbar />
-      <div class="main-content">
-        <Sidebar />
-        <div class="content">
-          <router-view />
-        </div>
+  <div class="layout">
+    <Navbar />
+    <div class="d-flex">
+      <Sidebar />
+      <div class="content flex-grow-1 p-2">
+        <router-view />
       </div>
     </div>
-  </template>
-  
-  <style scoped>
-  .layout {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-  }
-  .main-content {
-    display: flex;
-    flex: 1;
-  }
+  </div>
+</template>
+
+<style scoped>
+.layout {
+  height: 100vh;
+}
+.content {
+  margin-left: 330px;
+  margin-top: 60px; /* Navbar height */
+  overflow-y: auto;
+}
+@media (max-width: 992px) {
   .content {
-    flex: 1;
-    padding: 15px;
-    margin-left: 300px;
+    margin-left: 0;
   }
-  </style>
-  
+}
+</style>

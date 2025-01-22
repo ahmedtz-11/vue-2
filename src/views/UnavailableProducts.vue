@@ -2,10 +2,7 @@
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import { useProductStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/product.js';
-import { useDashboardStore } from '@/stores/dashboard';
 
-
-const dashboardStore = useDashboardStore();
 const productStore = useProductStore();
 const currentPage = ref(1);
 const itemsPerPage = ref(8);
@@ -51,14 +48,15 @@ const changePage = (page) => {
 
 onMounted(async () => {
   await productStore.fetchProducts();
+  await productStore.fetchUnavailableProducts();
 });
 </script>
 
 <template>
   <div class="card p-3">
-    <h3 class="mb-3"><i class="bi bi-card-list me-2"></i>List of Products</h3>
+    <h3 class="mb-3"><i class="bi bi-card-list me-2"></i>Not Available Products</h3>
 
-    
+    <!--  Search and Button Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="input-group w-50">
           <span class="input-group-text"><i class="bi bi-search"></i></span>        
@@ -69,31 +67,10 @@ onMounted(async () => {
             v-model="productStore.searchQuery" 
           />
         </div>
-        <button class="btn btn-primary btn-md" @click="addNewProduct">
-            <i class="bi bi-plus-circle me-2"></i> New Product
-        </button>
     </div>
 
-    
-    <div
-      v-if="productStore.showAlert"
-      class="alert alert-dismissible"
-      :class="`alert-${productStore.alertType}`"
-      role="alert"
-    >
-      {{ productStore.alertMessage }}
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        @click="closeAlert"
-      ></button>
-    </div>
 
-    <h6 class=" text-secondary mb-2">
-      <i class="bi bi-list-task me-2"></i>Total Products: {{ dashboardStore.totals.totalProducts }}
-    </h6>
-    
+    <!-- Products table -->
       <table class="table table-striped text-capitalize">
       <thead class="table-dark">
         <tr>
@@ -102,11 +79,10 @@ onMounted(async () => {
           <th>Category</th>
           <th>Price</th>
           <th>Status</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in paginatedProducts" :key="product.id">
+        <tr v-for="product in productStore.unavailableProducts" :key="product.id">
           <td>{{ product.name }}</td>
           <td>{{ product.description }}</td>
           <td>{{ product.category }}</td>
@@ -114,25 +90,9 @@ onMounted(async () => {
           <td :class="getStatusClass(product.status)">
             {{ product.status }}
           </td>
-          <td>
-            <div class="input-group">
-              <button
-                class="btn btn-outline-success btn-sm"
-                @click="updateProduct(product.id)"
-              >
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button
-                class="btn btn-outline-danger btn-sm"
-                @click="confirmDelete(product.id)"
-              >
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>           
-          </td>
         </tr>
         <tr v-if="productStore.filteredProducts.length === 0">
-          <td colspan="6" class="text-center text-muted">
+          <td colspan="5" class="text-center text-muted">
             <i class="bi bi-question-circle me-2"></i>No products found.
           </td>
         </tr>
@@ -157,7 +117,5 @@ onMounted(async () => {
       </div>
   </div>
 </template>
-
-
 
 

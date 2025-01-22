@@ -39,45 +39,72 @@ onMounted(() => {
 });
 </script>
 
+
 <template>
-  <div class="dashboard-container">
+  <div class="card p-3">
     <!-- Time and Day -->
-    <div class="time-day-card">
-      <h4>{{ currentFormattedDate }}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;{{ currentFormattedTime }}</h4>
+    <div class="text-center mb-4">
+      <h4 class="text-success">
+        {{ currentFormattedDate }} | {{ currentFormattedTime }}
+      </h4>
     </div>
 
     <!-- Welcome Message -->
-    <div class="welcome-message">
-      <h2>Welcome, {{ userStore.username }}!</h2>
-      <p>Here's an overview of the system.</p>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body text-center">
+        <h2 class="text-primary" style="text-transform: capitalize;">Welcome, {{ userStore.username }}!</h2>
+        <p class="text-secondary">Here's an overview of the system.</p>
+      </div>
     </div>
 
     <!-- Overview Cards -->
-    <div class="overview-cards">
-      <div class="card card-products">
-        <h3>Total Products</h3>
-        <p>{{ dashboardStore.totals.totalProducts }}</p>
+    <div class="row text-center g-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-success shadow h-100">
+          <div class="card-body">
+            <i class="bi bi-box-seam text-success display-4 mb-3"></i>
+            <h5 class="card-title">Total Products</h5>
+            <p class="fs-3 fw-bold text-success">{{ dashboardStore.totals.totalProducts }}</p>
+          </div>
+        </div>
       </div>
-      <div class="card card-stock">
-        <h3>Total Stock</h3>
-        <p>{{ dashboardStore.totals.totalStock }}</p>
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-primary shadow h-100">
+          <div class="card-body">
+            <i class="bi bi-cart3 text-primary display-4 mb-3"></i>
+            <h5 class="card-title">Total Stock</h5>
+            <p class="fs-3 fw-bold text-primary">{{ dashboardStore.totals.totalStock }}</p>
+          </div>
+        </div>
       </div>
-      <div class="card card-sales">
-        <h3>Total Revenue</h3>
-        <p>{{ dashboardStore.totals.totalSales }}</p>
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-warning shadow h-100">
+          <div class="card-body">
+            <i class="bi bi-currency-exchange text-warning display-4 mb-3"></i>
+            <h5 class="card-title">Total Revenue</h5>
+            <p class="fs-3 fw-bold text-warning">{{ dashboardStore.totals.totalSales }}</p>
+          </div>
+        </div>
       </div>
-      <div class="card card-users">
-        <h3>Total Users</h3>
-        <p>{{ dashboardStore.totals.totalUsers }}</p>
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-danger shadow h-100">
+          <div class="card-body">
+            <i class="bi bi-people text-danger display-4 mb-3"></i>
+            <h5 class="card-title">Total Users</h5>
+            <p class="fs-3 fw-bold text-danger">{{ dashboardStore.totals.totalUsers }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Performance Metrics -->
-    <div class="performance-metrics">
-      <div class="card table-card">
-        <h3>Performance Metrics (Sales and Cash In)</h3>
-        <table> 
-          <thead>
+    <div class="card mt-4 shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Performance Metrics (Sales and Cash In)</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead class="table-dark">
             <tr>
               <th>Day</th>
               <th>Sales</th>
@@ -94,144 +121,44 @@ onMounted(() => {
         </table>
       </div>
     </div>
+
+    <!-- Performance Metrics -->
+    <div class="card mt-4 shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Performance Metrics (Sales and Cash In)</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Day</th>
+              <th>Sales</th>
+              <th>Cash In (Tsh.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(data, day) in performanceData" :key="day">
+              <td>{{ day }}</td>
+              <td>{{ data.sales }}</td>
+              <td>{{ data.cashIn }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <style scoped>
-.dashboard-container {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.welcome-message {
-  border: 1px solid #ccc;
-  background-color: #eee;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.welcome-message h2 {
-  margin: 0;
-  font-size: 2rem;
-  text-transform: capitalize;
-}
-
-.welcome-message p {
-  font-size: 1.2rem;
-  color: #34495e;
-}
-
-/* Time and Day Section */
-.time-day-card {
-  border: 1px solid #ccc;
-  background-color: #eee;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 1.5rem;
-  color: #34495e;
-  text-align: center;
-}
-
-.overview-cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.card {
-  flex: 1;
-  min-width: 250px;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.card h3 {
+.card-body i {
   margin-bottom: 10px;
-  font-size: 1.5rem;
 }
 
-.card p {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #000;
-}
-
-.card-products {
-  color: #28a745;
-  border: 1px dashed #28a745;
-}
-
-.card-products:hover {
-  background: linear-gradient(30deg, #28a745, #69f88a);
-  color: #fff;
-}
-
-.card-stock {
-  color: #3498db;
-  border: 1px dashed #3498db;
-}
-
-.card-stock:hover {
-  background: linear-gradient(30deg, #3498db, #7fc8f8);
-  color: #fff;
-}
-
-.card-sales {
-  color: #f39c12;
-  border: 1px dashed #f39c12;
-}
-
-.card-sales:hover {
-  background: linear-gradient(30deg, #f39c12, #fcc368);
-  color: #fff;
-}
-
-.card-users {
-  color: #e74c3c;
-  border: 1px dashed #e74c3c;
-}
-
-.card-users:hover {
-  background: linear-gradient(30deg, #e74c3c, #fa877a);
-  color: #fff;
-}
-
-.performance-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.table-card {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-table th, table td {
-  padding: 10px;
-  text-align: center;
-  border: 1px solid #ddd;
-}
-
-table th {
-  background-color: #34495e;
-  color: white;
-}
-
-table td {
-  font-size: 1.2rem;
-}
-
-table tr:nth-child(even) {
-  background-color: #c9c9c9;
+.table th,
+.table td {
+  vertical-align: middle;
 }
 </style>
+
+

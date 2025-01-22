@@ -1,9 +1,27 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/user.js';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
 const userStore = useUserStore();
+const isSidebarOpen = ref(true); // Sidebar should be open by default on large screens
+const activeDropdown = ref(null);
+const router = useRouter();
 const isAdmin = ref(false);
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
+
+const toggleDropdown = (dropdown) => {
+  activeDropdown.value = activeDropdown.value === dropdown ? null : dropdown;
+};
+
+const logout = () => {
+  localStorage.removeItem('auth');
+  localStorage.removeItem('user');
+  router.push('/');
+};
 
 onMounted(() => {
   userStore.fetchLoggedInUser();
@@ -12,115 +30,165 @@ onMounted(() => {
   }
 });
 
-const toggleDropdown = (event) => {
-  const parent = event.target.closest('.has-dropdown');
-  if (parent) {
-    parent.classList.toggle('active');
-  }
-};
 </script>
 
 <template>
-  <aside class="sidebar">
-    <ul>
-      <li><router-link to="/layout">Dashboard</router-link></li>
-      <li><router-link to="/products">Products</router-link></li>
-      <li><router-link to="/stocks">Stocks</router-link></li>
-      <li><router-link to="/sales">Sales</router-link></li>
-      <li v-if="isAdmin"><router-link to="/users">Users</router-link></li>
-      
-      <!-- Products Dropdown -->
-      <!-- <li class="has-dropdown">
-        <a @click="toggleDropdown">Products &nbsp;&nbsp;+</a>
-        <ul class="dropdown">
-          <li><router-link to="/add-product">Add Product</router-link></li>
-          <li><router-link to="/products">View Products</router-link></li>
+  <aside
+    class="sidebar d-flex flex-column bg-dark text-white vh-100 fs-5 p-2"
+    :class="{ 'd-none d-lg-flex': !isSidebarOpen }"
+  >
+    <ul class="nav flex-column mt-3">
+      <li class="nav-item">
+        <router-link class="nav-link text-white" to="/layout">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </router-link>
+      </li>
+      <!-- Products Dropdowns -->
+      <li class="nav-item">
+        <a
+          class="nav-link text-white d-flex justify-content-between"
+          href="#"
+          @click.prevent="toggleDropdown('products')"
+        >
+          <span>
+            <i class="bi bi-boxes me-2"></i> Products
+          </span>
+          <i
+            class="bi"
+            :class="activeDropdown === 'products' ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
+        </a>
+        <ul v-if="activeDropdown === 'products'" class="nav flex-column ms-3 bg-secondary">
+          <li>
+            <router-link class="nav-link text-white" to="/products">
+              <i class="bi bi-eye me-2"></i> All Products
+            </router-link>
+          </li>
+          <li>
+            <router-link class="nav-link text-white" to="/available-products">
+              <i class="bi bi-check2-circle me-2"></i> Available Products
+            </router-link>
+          </li>
+          <li>
+            <router-link class="nav-link text-white" to="/unavailable-products">
+              <i class="bi bi-x-circle me-2"></i> Unavailable Products
+            </router-link>
+          </li>
         </ul>
-      </li> -->
-    </ul>
-    
-    
+      </li>
 
-    <div class="company-footer">
+      <!-- Stocks Dropdowns -->
+      <li class="nav-item">
+        <a
+          class="nav-link text-white d-flex justify-content-between"
+          href="#"
+          @click.prevent="toggleDropdown('stocks')"
+        >
+          <span>
+            <i class="bi bi-cart4 me-2"></i> Stocks
+          </span>
+          <i
+            class="bi"
+            :class="activeDropdown === 'stocks' ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
+        </a>
+        <ul v-if="activeDropdown === 'stocks'" class="nav flex-column ms-3 bg-secondary">
+          <li>
+            <router-link class="nav-link text-white" to="/stocks">
+              <i class="bi bi-eye me-2"></i> View Stocks
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link text-white d-flex justify-content-between"
+          href="#"
+          @click.prevent="toggleDropdown('transaction')"
+        >
+          <span>
+            <i class="bi bi-currency-exchange me-2"></i> Sales
+          </span>
+          <i
+            class="bi"
+            :class="activeDropdown === 'transaction' ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
+        </a>
+        <ul v-if="activeDropdown === 'transaction'" class="nav flex-column ms-3 bg-secondary">
+          <li>
+            <router-link class="nav-link text-white" to="/transaction-list">
+              <i class="bi bi-list-ul me-2"></i> Transaction List
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      <li v-if="isAdmin">
+            <router-link class="nav-link text-white" to="/users">
+              <i class="bi bi-person-lines-fill me-2"></i> Users
+            </router-link>
+      </li>
+      
+      <!-- Other Dropdowns -->
+      <li class="nav-item">
+        <a
+          class="nav-link text-white d-flex justify-content-between"
+          href="#"
+          @click.prevent="toggleDropdown('other')"
+        >
+          <span>
+            <i class="bi bi-folder me-2"></i> Other
+          </span>
+          <i
+            class="bi"
+            :class="activeDropdown === 'other' ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
+        </a>
+        <ul v-if="activeDropdown === 'other'" class="nav flex-column ms-3 bg-secondary">
+          <li>
+            <router-link class="nav-link text-white" to="/add-category">
+              <i class="bi bi-plus-circle me-2"></i> Add Category
+            </router-link>
+          </li>
+        </ul>
+      </li>
+      
+      <li>
+        <a class="nav-link text-danger" href="#" @click.prevent="logout">
+          <i class="bi bi-box-arrow-right me-2"></i> Logout
+        </a>
+      </li>
+    </ul>
+
+    <footer class="mt-auto text-center small fs-6">
       <p>
-        Powered by:
-        <span><img src="/home/ahmed/Documents/vue-projects/vue-2/src/assets/rahisi.png" alt="Company Logo" /></span>
+        Powered by: <br />
+        <img
+          src="@/assets/rahisi.png"
+          alt="Company Logo"
+          class="img-fluid"
+          style="height: 35px;"
+        />
       </p>
-      <p>&copy; 2022-2027 Rahisi Solutions</p>
-    </div>
+      <!-- <p class="mt-1">&copy; 2022-2027 Rahisi Solutions</p> -->
+    </footer>
   </aside>
 </template>
 
 <style scoped>
 .sidebar {
-  width: 300px;
-  background-color: #34495e;
-  color: white;
-  padding: 20px;
-  height: 100vh;
+  width: 330px;
   position: fixed;
   top: 0;
   left: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  height: 100%;
+  z-index: 1050;
+  transition: transform 0.3s ease-in-out;
+}
+.d-none {
+  display: none !important;
 }
 
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin: 10px 0;
-}
-
-.sidebar li a {
-  color: #ecf0f1;
-  text-decoration: none;
-  font-size: 1.2rem;
-  display: block;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.sidebar li a:hover {
-  background-color: #2c3e50;
-}
-
-.has-dropdown > a {
-  cursor: pointer;
-}
-
-.has-dropdown .dropdown {
-  display: none;
-  list-style: none;
-  padding: 0;
-  margin-left: 10px;
-}
-
-.has-dropdown.active .dropdown {
-  display: block;
-}
-
-.dropdown li {
-  border-bottom: 1px solid #ecf0f1
-}
-
-.company-logo {
-  text-align: center;
-  margin: 20px 0;
-}
-
-.company-logo img {
-  max-width: 100%;
-  height: auto;
-}
-
-.company-footer {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #bdc3c7;
+.nav-link:hover {
+  background-color: #495057;
 }
 </style>

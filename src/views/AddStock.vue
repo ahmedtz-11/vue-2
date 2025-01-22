@@ -40,113 +40,98 @@ onMounted(() => {
 });
 </script>
 
+
 <template>
-  <div class="add-stock-container">
-    <h3>Add New Stock</h3>
-    <form class="add-stock-form" @submit.prevent="addStock">
-      <div class="form-row">
+  <div class="card shadow-sm p-3">
+    <h3 class="mb-3"><i class="bi bi-cart-plus me-2"></i>Add New Stock</h3>
+    <form @submit.prevent="addStock">
+      <div class="row mb-3">
         <!-- Product -->
-        <div class="form-group">
-          <label for="product">Product</label>
-          <select id="product" class="form-control" v-model="product" required>
+        <div class="col-md-6">
+          <label for="product" class="form-label">
+            <i class="bi bi-box me-2"></i>Product
+          </label>
+          <select id="product" class="form-select" v-model="product" required>
             <option value="" disabled>Select a product</option>
-            <option v-for="prod in productStore.products" :key="prod.id" :value="prod.name">{{ prod.name }}</option>
+            <option v-for="prod in productStore.products" :key="prod.id" :value="prod.name" class="text-capitalize">
+              {{ prod.name }}
+            </option>
           </select>
         </div>
 
-        <!-- Quantity Available -->
-        <div class="form-group">
-          <label for="quantity">Quantity</label>
-          <input type="number" id="quantity" class="form-control" v-model="quantity" required min="1" />
+        <!-- Quantity -->
+        <div class="col-md-6">
+          <label for="quantity" class="form-label">
+            <i class="bi bi-bag-plus me-2"></i>Quantity
+          </label>
+          <input 
+            type="number" 
+            id="quantity" 
+            class="form-control" 
+            v-model="quantity" 
+            required 
+            min="1" 
+          />
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="row mb-3">
         <!-- Purchasing Price -->
-        <div class="form-group">
-          <label for="purchasingPrice">Purchasing Price</label>
-          <input type="number" id="purchasingPrice" class="form-control" v-model="purchasingPrice" required min="0" />
+        <div class="col-md-6">
+          <label for="purchasingPrice" class="form-label">
+            <i class="bi bi-cash-stack me-2"></i>Purchasing Price
+          </label>
+          <input 
+            type="number" 
+            id="purchasingPrice" 
+            class="form-control" 
+            v-model="purchasingPrice" 
+            required 
+            min="0" 
+          />
         </div>
 
         <!-- Expiry Date -->
-        <div class="form-group">
-          <label for="expiryDate">Expiry Date</label>
-          <input type="date" id="expiryDate" class="form-control" v-model="expiryDate" required />
-        </div>
-
-        <!-- Added By -->
-        <div class="form-group">
-          <label for="addedBy">Added By</label>
-          <input type="text" id="addedBy" class="form-control" :value="userStore.username" disabled />
+        <div class="col-md-6">
+          <label for="expiryDate" class="form-label">
+            <i class="bi bi-calendar-minus me-2"></i>Expiry Date
+          </label>
+          <input 
+            type="date" 
+            id="expiryDate" 
+            class="form-control" 
+            v-model="expiryDate" 
+            required 
+          />
         </div>
       </div>
 
-      <div class="form-row">
-        <!-- Submit Button -->
-        <button type="button" class="btn btn-warning" @click="back">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Stock</button>
+      <div class="row mb-4">
+        <!-- Added By -->
+        <div class="col-md-6">
+          <label for="addedBy" class="form-label">
+            <i class="bi bi-person me-2"></i>Added By
+          </label>
+          <input 
+            type="text" 
+            id="addedBy" 
+            class="form-control" 
+            :value="userStore.username" 
+            disabled 
+          />
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-danger" @click="back">
+          <i class="bi-arrow-left-circle"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-success">
+          <i class="bi-save"></i> Add Stock
+        </button>
       </div>
     </form>
   </div>
 </template>
 
-
-<style scoped>
-.add-stock-container {
-  /* max-width: 800px; */
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-}
-
-.add-stock-form .form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.add-stock-form .form-group {
-  flex: 1;
-}
-
-.add-stock-form label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.add-stock-form .form-control {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.add-stock-form .btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.add-stock-form .btn:hover {
-  background-color: #218838;
-}
-
-.add-stock-form .btn-warning {
-  background-color: rgb(210, 30, 45);
-}
-
-.add-stock-form .btn-warning:hover {
-  background-color: rgb(168, 20, 32);
-}
-</style>

@@ -18,14 +18,12 @@ export const useStockStore = defineStore('stockStore', {
   actions: {
     async fetchStocks() {
       try {
-        const response = await axios.get('http://localhost:8080/vue-api/stocks/getStocks.php');
-        if (response.data.success && Array.isArray(response.data.stocks)) {
-          this.stocks = response.data.stocks;
-        } else {
-          console.error('Invalid API response:', response.data);
-        }
+        const response = await dataService.getSplash();
+        this.stocks = response?.data?.data?.stocks || [];
+        console.log('Stocks:', this.stocks);
       } catch (error) {
         console.error('Error fetching stocks:', error);
+        alert('Failed to load stocks.');
       }
     },
 

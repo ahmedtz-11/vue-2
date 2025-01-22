@@ -51,140 +51,113 @@ const back = () => {
 };
 </script>
 
-<template>
-  <div class="add-product-container">
-    <h3>{{ route.params.id ? 'Edit Product Details' : 'Add New Product' }}</h3>
-    <form class="add-product-form" @submit.prevent="saveProduct">
-      <div class="form-row">
-        <!-- Name -->
-        <div class="form-group">
-          <label for="name">Product Name</label>
-          <input
-            type="text"
-            id="name"
-            class="form-control"
-            v-model="name"
-            required
-          />
-        </div>
+<template>     
+  <div class="card p-3">
+    <h3 class="mb-3">
+      <i class="bi bi-pencil-square me-2"></i>
+      {{ $route.params.id ? "Edit Product Details" : "Add New Product" }}
+    </h3>
+    <form @submit.prevent="saveProduct">
+      
+       <div class="row mb-3">
 
-        <!-- Category -->
-        <div class="form-group">
-          <label for="category">Category</label>
-          <select
-            id="category"
-            class="form-control"
-            v-model="category"
-            required
-          >
-            <option value="" disabled>Select a category</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.category">{{ cat.category }}</option>
-          </select>
-        </div>
+            <div class="col-lg-6">
+              <label for="name" class="form-label">
+                <i class="bi bi-box me-2"></i>Product Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                class="form-control"
+                v-model="name"
+                required
+              />
+            </div>
+              
+          
+            <div class="col-lg-6">
+                <label for="category" class="form-label">
+                  <i class="bi bi-card-list me-2"></i>Category
+                </label>
+                <select
+                  id="category"
+                  class="form-select"
+                  v-model="category"
+                  required
+                >
+                  <option value="" disabled>Select a category</option>
+                  <option
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    :value="cat.category"
+                  >
+                    {{ cat.category }}
+                  </option>
+                </select>
+            </div>
+       </div>
 
-        <!-- Price -->
-        <div class="form-group">
-          <label for="price">Price</label>
-          <input
-            type="number"
-            id="price"
-            class="form-control"
-            v-model="price"
-            required
-            min="0"
-          />
-        </div>
+      <div class="row mb-3">
+          <div class="col-lg-6">
+              
+              <label for="price" class="form-label">
+                <i class="bi bi-currency-dollar me-2"></i>Price
+              </label>
+              <input
+                type="number"
+                id="price"
+                class="form-control"
+                v-model="price"
+                required
+                min="0"
+              />
+          </div>
+
+          
+          <div class="col-lg-6">
+            <label for="status" class="form-label">
+              <i class="bi bi-info-circle me-2"></i>Status
+            </label>
+            <select
+              id="status"
+              class="form-select"
+              v-model="status"
+              required
+            >
+              <option value="" disabled>Select a status</option>
+              <option v-for="stat in statuses" :key="stat" :value="stat">
+                {{ stat }}
+              </option>
+            </select>
+          </div> 
       </div>
 
-      <div class="form-row">
-        <!-- Status -->
-        <div class="form-group">
-          <label for="status">Status</label>
-          <select id="status" class="form-control" v-model="status" required>
-            <option value="" disabled>Select a status</option>
-            <option v-for="stat in statuses" :key="stat" :value="stat">{{ stat }}</option>
-          </select>
-        </div>
-
-        <!-- Description -->
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea
-            id="description"
-            class="form-control"
-            v-model="description"
-            rows="1"
-            placeholder="Write anything about product..."
-            required
-          ></textarea>
-        </div>
+      
+      <div class="mb-3">
+        <label for="description" class="form-label">
+          <i class="bi bi-chat-dots me-2"></i>Description
+        </label>
+        <textarea
+          id="description"
+          class="form-control"
+          v-model="description"
+          rows="2"
+          placeholder="Write anything about the product..."
+          required
+        ></textarea>
       </div>
 
-      <div class="form-row">
-        <button type="button" class="btn btn-warning" @click="back">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-          {{ route.params.id ? 'Save Changes' : 'Add Product' }}
+      
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-danger d-flex align-items-center" @click="back">
+          <i class="bi bi-arrow-left-circle me-2"></i>Cancel
+        </button>
+        <button type="submit" class="btn btn-success d-flex align-items-center">
+          <i class="bi bi-save me-2"></i>
+          {{ $route.params.id ? "Save Changes" : "Add Product" }}
         </button>
       </div>
     </form>
   </div>
 </template>
 
-<style scoped>
-.add-product-container {
-  width: 100%;
-  padding: 13px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-}
-
-.add-product-form .form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.add-product-form .form-group {
-  flex: 1;
-}
-
-.add-product-form label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.add-product-form .form-control {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.add-product-form .btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.add-product-form .btn:hover {
-  background-color: #218838;
-}
-
-.add-product-form .btn-warning {
-  background-color: rgb(210, 30, 45);
-}
-
-.add-product-form .btn-warning:hover {
-  background-color: rgb(168, 20, 32);
-}
-</style>

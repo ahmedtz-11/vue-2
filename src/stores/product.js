@@ -4,7 +4,12 @@ import dataService from '@/services/dataService';
 
 export const useProductStore = defineStore('product', {
   state: () => ({
+    alertMessage: '',
+    alertType: 'info', 
+    showAlert: false, 
     products: [],
+    availableProducts: [],
+    unavailableProducts: [],
     searchQuery: '',
     currentProduct: {
       name: '',
@@ -32,9 +37,45 @@ export const useProductStore = defineStore('product', {
         console.log('Products:', this.products);
       } catch (error) {
         console.error('Error fetching products:', error);
-        alert('Failed to load products.');
+        this.showAlert = true;
+        this.alertMessage = 'Failed to load products.';
+        this.alertType = 'danger';
       }
     },
+
+
+    async fetchAvailableProducts() {
+      try {
+        const response = await dataService.getSplash();
+        const allProducts = response?.data?.data?.products || [];
+        // Filter products to include only those with status 'Available'
+        this.availableProducts = allProducts.filter(product => product.status === "Available");
+        console.log('Available Products:', this.availableProducts);
+      } catch (error) {
+        console.error('Error fetching available products:', error);
+        this.showAlert = true;
+        this.alertMessage = 'Failed to load available products.';
+        this.alertType = 'danger';
+      }
+    },
+
+    async fetchUnavailableProducts() {
+      try {
+        const response = await dataService.getSplash();
+        const allProducts = response?.data?.data?.products || [];
+        // Filter products to include only those with status 'Not Available'
+        this.unavailableProducts = allProducts.filter(product => product.status === "Not Available");
+        console.log('Available Products:', this.unavailableProducts);
+      } catch (error) {
+        console.error('Error fetching unavailable products:', error);
+        this.showAlert = true;
+        this.alertMessage = 'Failed to load unavailable products.';
+        this.alertType = 'danger';
+      }
+    },
+    
+
+
     //get a single product by id
     async fetchProductById(id) {
       try {
@@ -48,7 +89,9 @@ export const useProductStore = defineStore('product', {
         };
       } catch (error) {
         console.error('Error fetching product:', error);
-        alert('Failed to load product details.');
+        this.showAlert = true;
+        this.alertMessage = 'Failed to load product details.';
+        this.alertType = 'danger';
       }
     },
     //add new product or edit the existing product
@@ -60,14 +103,18 @@ export const useProductStore = defineStore('product', {
       try {
         const response = await axios.post(endpoint, productData);
         if (response.data.message) {
-          alert(response.data.message);
+          this.showAlert = true;
+          this.alertMessage = response.data.message;
+          this.alertType = 'success';
           await this.fetchProducts();
         } else {
           alert(response.data.error);
         }
       } catch (error) {
         console.error('Error saving product:', error);
-        alert('Failed to save product.');
+        this.showAlert = true;
+        this.alertMessage = 'Failed to save product.';
+        this.alertType = 'error';
       }
     },
     //delete product by id
@@ -75,14 +122,21 @@ export const useProductStore = defineStore('product', {
       try {
         const response = await dataService.deleteProduct(id);
         if (response.data.success) {
-          alert(response.data.message);
+          this.showAlert = true;
+          this.alertMessage = response.data.message;;
+          this.alertType = 'success';
           await this.fetchProducts();
         } else {
-          alert(response.data.error);
+          this.showAlert = true;
+          this.alertMessage = response.data.error;;
+          this.alertType = 'error';
         }
       } catch (error) {
         console.error('Error deleting product:', error);
         alert('Failed to delete product.');
+        this.showAlert = true;
+        this.alertMessage = 'Failed to delete product';
+        this.alertType = 'error';
       }
     },
 
@@ -93,9 +147,21 @@ export const useProductStore = defineStore('product', {
         return response?.data?.data?.categories || [];
       } catch (error) {
         console.error('Error fetching categories:', error);
-        alert('Failed to load categories.');
+        alertMessage.value = 'Failed to load categories.';
+        alertType.value = 'error';
+        showAlert.value = true;
         return [];
       }
     },
+
+    // Create new categories
+    async newCategory(category) {
+          try {
+            await dataService.newCategory(category);
+            await this.getSplash();
+          } catch (error) {
+            console.error('Error creating category:', error);
+          }
+        }
   },
 });

@@ -1,65 +1,61 @@
 import http from '/home/ahmed/Documents/vue-projects/vue-2/src/services/httpcommon.js';
 
+class DataService {
 //SPLASH ENDPOINT
-const getSplash = () => {
+ getSplash = () => {
   return http.get('/splash/getSplash.php');
 }
 
 //USERS ENDPOINTS
-const login = (credentials) => {
+login = (credentials) => {
   return http.post('/users/login.php', credentials);
 };
 
-const createUser = (data) => {
+createUser = (data) => {
     return http.post('/users/addUser.php', data);
   };
 
-const updateUser = (id, data) => {
+updateUser = (id, data) => {
     return http.put(`/users/updateProduct.php?id=${id}`, data);
   };
 
-  const deleteUser = (id) => {
+deleteUser = (id) => {
     return http.delete(`/users/deleteUser.php?id=${id}`);
   };
 
 //PRODUCTS ENDPOINTS
-const getProductById = (id) => {
+getProductById = (id) => {
   return http.get(`/products/getSingleProduct.php?id=${id}`);
 };
 
-const createProduct = (data) => {
+createProduct = (data) => {
   return http.post('/products/addProduct.php', data);
 };
 
-const updateProduct = (id, data) => {
+updateProduct = (id, data) => {
   return http.put(`/products/updateProduct.php?id=${id}`, data);
 };
 
-const deleteProduct = (id) => {
+deleteProduct = (id) => {
   return http.delete(`/products/deleteProduct.php?id=${id}`);
 };
 
+// CATEGORIES ENDPOINT
+newCategory = (data) => {
+  return http.post('/products/addCategory.php', data);
+};
+
 //STOCK ENDPOINTS
-const updateStock = (id, data) => {
+updateStock = (id, data) => {
     return http.put(`/stock/updateStock.php?id=${id}`, data);
 }
 
 //SALES AND TRANSACTIONS ENDPOINT
-const newTransaction = (data) => {
+newTransaction = (data) => {
   return http.post('/sales/addTransaction.php', data);
 };
 
+}
 
-export default {
-  login,
-  createUser,
-  getSplash,
-  updateUser,
-  deleteUser,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  updateStock,
-  newTransaction
-};
+
+export default new DataService();

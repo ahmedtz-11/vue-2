@@ -9,6 +9,9 @@ import Dashboard from '../views/Dashboard.vue';
 import LoginForm from '../views/LoginForm.vue';
 import Layout from '../components/Layout.vue';
 import Products from '../views/Products.vue';
+import AddCategory from '@/views/AddCategory.vue';
+import AvailableProducts from '@/views/AvailableProducts.vue';
+import UnavailableProducts from '@/views/UnavailableProducts.vue';
 
 const routes = [
   {
@@ -21,6 +24,9 @@ const routes = [
     children: [
       { path: '', component: Dashboard },
       { path: '/products', component: Products },
+      { path: '/available-products', component: AvailableProducts },
+      { path: '/unavailable-products', component: UnavailableProducts },
+      { path: '/add-category', component: AddCategory },
       { path: '/stocks', component: Stock },
       {
         path: '/add-product/:id?',
@@ -28,10 +34,11 @@ const routes = [
         component: AddProduct,
         props: true, // Allows passing route params as props
       },      
-      { path: '/sales', component: Sales },
+      { path: '/transaction', component: Sales },
       { path: '/add-stock', component: AddStock },
       { path: '/users', component: Users },
       { path: '/transaction-list', component: TransactionList },
+      
 
     ],
     meta: { requiresAuth: true },

@@ -1,36 +1,51 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import dataService from '@/services/dataService'; // Import the service
+import dataService from '@/services/dataService';
 
 const username = ref('');
 const password = ref('');
 const usernameError = ref(false);
 const passwordError = ref(false);
+const showPassword = ref(false);
 const router = useRouter();
 
-const showPassword = ref(false);
+// Alert state
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('danger');
 
+// Close Alert
+const closeAlert = () => {
+  showAlert.value = false;
+};
+
+// Toggles
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
+// Forgot Password Placeholder
 const forgotPassword = () => {
-  alert('Forgot password functionality is under construction.');
+  alertMessage.value = 'Forgot password functionality is under construction.';
+  alertType.value = 'info';
+  showAlert.value = true;
 };
 
+// Form Validation
 const validateForm = () => {
   usernameError.value = !username.value;
   passwordError.value = !password.value;
   return !usernameError.value && !passwordError.value;
 };
 
+// Handle Form Submission
 const handleSubmit = async () => {
   if (validateForm()) {
     try {
-      const response = await dataService.login({ 
-        username: username.value, 
-        password: password.value 
+      const response = await dataService.login({
+        username: username.value,
+        password: password.value,
       });
 
       if (response.data.success) {
@@ -38,64 +53,93 @@ const handleSubmit = async () => {
         localStorage.setItem('user', JSON.stringify({ username: username.value }));
         router.push('/layout');
       } else {
-        usernameError.value = true;
-        passwordError.value = true;
-        alert(response.data.error || 'Invalid credentials');
+        alertMessage.value = response.data.error || 'Invalid credentials';
+        alertType.value = 'danger';
+        showAlert.value = true;
       }
     } catch (error) {
       console.error('Login request failed:', error);
-      alert('An error occurred. Please try again later.');
+      alertMessage.value = 'An error occurred. Please try again later.';
+      alertType.value = 'danger';
+      showAlert.value = true;
     }
   }
 };
 </script>
 
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <h3>Business Management System</h3>
+  <div class="d-flex justify-content-center align-items-center vh-100" style="background: rgba(35, 35, 35, 0.1)" >
+    <div class="card shadow-lg" style="width: 550px; background: rgba(35, 35, 35, 0.2);">
+
+      <div class="card-header text-center bg-secondary text-white">
+        <h2><i class="bi bi-shop display-5 me-3"></i>Dukani</h2>
       </div>
-      <div class="login-body">
+      <div class="card-body fs-5">
+        <!-- Bootstrap Alert -->
+      <div
+        v-if="showAlert"
+        class="alert alert-dismissible"
+        :class="`alert-${alertType}`"
+        role="alert"
+      >
+        {{ alertMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          @click="closeAlert"
+        ></button>
+      </div>
+
         <form @submit.prevent="handleSubmit">
-          <!-- USERNAME FIELD -->
-          <div class="form-group">
-            <label for="username">Username</label>
+          <!-- Username Field -->
+          <div class="mb-3">
+            <label for="username" class="form-label">
+              <i class="bi bi-person me-2"></i>Username
+            </label>
             <input
               type="text"
               id="username"
               v-model="username"
-              :class="{ 'error': usernameError }"
+              class="form-control fs-5"
+              :class="{ 'is-invalid': usernameError }"
               required
             />
-            <span v-if="usernameError" class="error-text">Valid username is required</span>
+            <div v-if="usernameError" class="invalid-feedback">Valid username is required</div>
           </div>
 
-          <!-- PASSWORD FIELD -->
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-wrapper">
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label for="password" class="form-label">
+              <i class="bi bi-key me-2"></i>Password
+            </label>
+            <div class="input-group">
               <input
                 :type="showPassword ? 'text' : 'password'"
                 id="password"
                 v-model="password"
-                :class="{ 'error': passwordError }"
+                class="form-control fs-5"
+                :class="{ 'is-invalid': passwordError }"
                 required
               />
-              <button type="button" class="show-password" @click="togglePasswordVisibility">
-                {{ showPassword ? 'Hide' : 'Show' }}
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="togglePasswordVisibility"
+              >
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
               </button>
             </div>
-            <span v-if="passwordError" class="error-text">Valid password is required</span>
+            <div v-if="passwordError" class="invalid-feedback">Valid password is required</div>
           </div>
 
-          <!-- FORGOT PASSWORD LINK -->
-          <div class="form-footer">
-            <a href="#" @click="forgotPassword">Forgot Password?</a>
+          <!-- Forgot Password -->
+          <div class="d-flex justify-content-end mb-3">
+            <a href="#" @click.prevent="forgotPassword" class="text-decoration-none">Forgot Password?</a>
           </div>
 
-          <!-- SUBMIT BUTTON -->
-          <button type="submit" class="btn-submit">Login</button>
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-secondary fs-5 w-100">Login</button>
         </form>
       </div>
     </div>
@@ -103,116 +147,8 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: url('/home/ahmed/Documents/vue-projects/vue-2/src/assets/pexels-pixabay-164501.jpg')
-    no-repeat center center/cover;
-  backdrop-filter: blur(200px);
-}
-
-.login-card {
-  width: 550px;
-  background: rgba(255, 255, 255, 0.5);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ddd;
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 15px;
-  color: #111;
-}
-
-.login-body {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #bbb;
+.card {
   border-radius: 10px;
-  font-size: 18px;
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.password-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.password-wrapper input {
-  flex: 1;
-}
-
-.show-password {
-  margin-left: 5px;
-  padding: 8px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.show-password:hover {
-  background: #0056b3;
-}
-
-.error {
-  border-color: red;
-}
-
-.error-text {
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.form-footer {
-  text-align: right;
-  margin-bottom: 20px;
-}
-
-.form-footer a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.form-footer a:hover {
-  text-decoration: underline;
-}
-
-.btn-submit {
-  width: 100%;
-  padding: 8px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.btn-submit:hover {
-  background: #0056b3;
 }
 
 </style>

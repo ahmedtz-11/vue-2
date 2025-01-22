@@ -16,11 +16,11 @@ const paginatedStocks = computed(() => {
 
 const totalPages = computed(() => Math.ceil(stockStore.filteredStocks.length / pageSize));
 
-const goToPage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
+// const goToPage = (page) => {
+//   if (page >= 1 && page <= totalPages.value) {
+//     currentPage.value = page;
+//   }
+// };
 
 const addNewStock = () => {
   router.push('/add-stock');
@@ -38,23 +38,31 @@ onMounted(() => {
 });
 </script>
 
-<template>
-  <div class="stock-container">
-    <div class="header">
-      <h3>List of Stocks</h3>
-      <input
-        type="text"
-        class="search-box"
-        placeholder="Search stock..."
-        v-model="stockStore.searchQuery"
-      />
-      <button class="btn btn-primary" @click="addNewStock">Add New Stock</button>
-    </div>
 
-    <table class="stock-table">
-      <thead>
+<template>
+  <div class="card p-3">
+      <h3 class="mb-3"><i class="bi-cart4 me-2"></i>List of Stocks</h3>
+
+      <!--  Search and Button Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="input-group w-50">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>        
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Search stock..." 
+            v-model="stockStore.searchQuery" 
+          />
+        </div>
+        <button class="btn btn-primary btn-md" @click="addNewStock">
+            <i class="bi bi-cart-plus me-2"></i>Add New Stock
+        </button>
+      </div>
+
+    <!-- Stocks Table -->
+    <table class="table table-striped table-hover text-capitalize">
+      <thead class="table-dark">
         <tr>
-          <th>#</th>
           <th>Product</th>
           <th>Quantity</th>
           <th>Purchasing Price</th>
@@ -66,7 +74,6 @@ onMounted(() => {
       </thead>
       <tbody>
         <tr v-for="stock in paginatedStocks" :key="stock.id">
-          <td>{{ stock.id }}</td>
           <td>{{ stock.product_name }}</td>
           <td>{{ stock.quantity }}</td>
           <td>{{ stock.purchasing_price }}</td>
@@ -74,142 +81,35 @@ onMounted(() => {
           <td>{{ stock.added_by }}</td>
           <td>{{ stock.added_at }}</td>
           <td>
-            <button class="btn btn-warning btn-sm" @click="editStock(stock.id)">
-              Edit
+            <button class="btn btn-outline-success btn-sm me-2" @click="editStock(stock.id)">
+              <i class="bi-pencil"></i>
             </button>
-            <button class="btn btn-danger btn-sm" @click="deleteStock(stock.id)">
-              Delete
+            <button class="btn btn-outline-danger btn-sm" @click="deleteStock(stock.id)">
+              <i class="bi-trash"></i>
             </button>
           </td>
         </tr>
         <tr v-if="paginatedStocks.length === 0">
-          <td colspan="8" class="no-results">No stocks found.</td>
+          <td colspan="7" class="text-center text-muted">No stocks found.</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="pagination">
-      <button class="btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
-        Previous
-      </button>
-      <button
-        v-for="page in pageNumbers"
-        :key="page"
-        :class="['btn', { 'btn-active': currentPage === page }]"
-        @click="goToPage(page)"
-      >
-        {{ page }}
-      </button>
-      <button class="btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
-        Next
-      </button>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center mt-3">
+        <button 
+          class="btn btn-secondary me-1" 
+          @click="currentPage > 1 && currentPage--" 
+          :disabled="currentPage === 1">
+          <i class="bi bi-chevron-bar-left"></i> Previous
+        </button>
+
+        <button 
+          class="btn btn-secondary" 
+          @click="currentPage < totalPages && currentPage++" 
+          :disabled="currentPage === totalPages">
+          Next <i class="bi bi-chevron-bar-right"></i>
+        </button>
     </div>
   </div>
 </template>
-
-<style scoped>
-.stock-container {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  height: 100vh;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.search-box {
-  padding: 7px;
-  font-size: 16px;
-  width: 270px;
-  margin-right: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-.stock-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.stock-table th,
-.stock-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.stock-table th {
-  background-color: #2c3e50;
-  color: white;
-  font-weight: bolder;
-}
-
-.stock-table tr:hover {
-  background-color: #ddd;
-}
-
-.no-results {
-  text-align: center;
-  color: #999;
-  font-style: italic;
-}
-
-.btn {
-  padding: 8px 12px;
-  margin: 0 2px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-warning {
-  background-color: #28a745;
-  color: white;
-  margin-right: 5px;
-}
-
-.btn-warning:hover {
-  background-color: #218838;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-.pagination {
-  margin-top: 20px;
-  text-align: center;
-  justify-content: center;
-}
-
-.pagination .btn-active {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-}
-
-.pagination .btn:hover {
-  background-color: #f0f0f0;
-  color: #007bff;
-}
-</style>
