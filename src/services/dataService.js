@@ -1,61 +1,63 @@
-import http from '/home/ahmed/Documents/vue-projects/vue-2/src/services/httpcommon.js';
+import http from "/home/ahmed/Documents/vue-projects/vue-2/src/services/httpcommon.js";
 
 class DataService {
-//SPLASH ENDPOINT
- getSplash = () => {
-  return http.get('/splash/getSplash.php');
-}
-
-//USERS ENDPOINTS
-login = (credentials) => {
-  return http.post('/users/login.php', credentials);
-};
-
-createUser = (data) => {
-    return http.post('/users/addUser.php', data);
+  //SPLASH ENDPOINT
+  getSplash = () => {
+    return http.get("/splash/getSplash.php");
   };
 
-updateUser = (id, data) => {
-    return http.put(`/users/updateProduct.php?id=${id}`, data);
+  //USERS ENDPOINTS
+  login = (credentials) => {
+    return http.post("/users/login.php", credentials);
   };
 
-deleteUser = (id) => {
-    return http.delete(`/users/deleteUser.php?id=${id}`);
+  createUser = (data) => {
+    return http.post("/users/addUser.php", data);
   };
 
-//PRODUCTS ENDPOINTS
-getProductById = (id) => {
-  return http.get(`/products/getSingleProduct.php?id=${id}`);
-};
+  updateUser = (id, data) => {
+    return http.put(`/users/updateUser.php?id=${id}`, data);
+  };
 
-createProduct = (data) => {
-  return http.post('/products/addProduct.php', data);
-};
+  deleteUser = (id) => {
+    return http.delete(`/users/deleteUser.php`, {
+      data: { id },
+    });
+  };
 
-updateProduct = (id, data) => {
-  return http.put(`/products/updateProduct.php?id=${id}`, data);
-};
+  //PRODUCTS ENDPOINTS
+  getProductById = (id) => {
+    return http.get(`/products/getSingleProduct.php?id=${id}`);
+  };
 
-deleteProduct = (id) => {
-  return http.delete(`/products/deleteProduct.php?id=${id}`);
-};
+  createProduct = (data) => {
+    return http.post("/products/addProduct.php", data);
+  };
 
-// CATEGORIES ENDPOINT
-newCategory = (data) => {
-  return http.post('/products/addCategory.php', data);
-};
+  updateProduct = (id, data) => {
+    return http.put(`/products/updateProduct.php?id=${id}`, data);
+  };
 
-//STOCK ENDPOINTS
-updateStock = (id, data) => {
+  deleteProduct = (id) => {
+    return http.delete(`/products/deleteProduct.php`, {
+      data: { id },
+    });
+  };
+
+  // CATEGORIES ENDPOINT
+  newCategory = (data) => {
+    return http.post("/products/addCategory.php", data);
+  };
+
+  //STOCK ENDPOINTS
+  updateStock = (id, data) => {
     return http.put(`/stock/updateStock.php?id=${id}`, data);
+  };
+
+  //SALES AND TRANSACTIONS ENDPOINT
+  newTransaction = (data) => {
+    return http.post("/sales/addTransaction.php", data);
+  };
 }
-
-//SALES AND TRANSACTIONS ENDPOINT
-newTransaction = (data) => {
-  return http.post('/sales/addTransaction.php', data);
-};
-
-}
-
 
 export default new DataService();

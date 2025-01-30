@@ -1,17 +1,17 @@
+import AddStock from '/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddStock.vue';
+import AddCategory from '@/views/AddCategory.vue';
+import AvailableProducts from '@/views/AvailableProducts.vue';
 import Sales from '@/views/Sales.vue';
 import Stock from '@/views/Stock.vue';
 import TransactionList from '@/views/TransactionList.vue';
+import UnavailableProducts from '@/views/UnavailableProducts.vue';
 import Users from '@/views/Users.vue';
-import AddStock from '@/views/AddStock.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import AddProduct from '../views/AddProduct.vue';
+import Layout from '../components/Layout.vue';
+import AddProduct from '/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddProduct.vue';
 import Dashboard from '../views/Dashboard.vue';
 import LoginForm from '../views/LoginForm.vue';
-import Layout from '../components/Layout.vue';
 import Products from '../views/Products.vue';
-import AddCategory from '@/views/AddCategory.vue';
-import AvailableProducts from '@/views/AvailableProducts.vue';
-import UnavailableProducts from '@/views/UnavailableProducts.vue';
 
 const routes = [
   {
@@ -51,7 +51,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('auth'); 
+  const isAuthenticated = !!sessionStorage.getItem('auth'); 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/');
   } else {

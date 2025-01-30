@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useProductStore } from '@/stores/product';
+import Alert from "@/components/Alert.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -30,16 +31,23 @@ const back = () => {
 </script>
 
 <template>
+  <Alert
+      :message="productStore.alertMessage"
+      :type="productStore.alertType"
+      :show="productStore.showAlert"
+      @close="productStore.showAlert = false"
+    />
   <div class="card shadow p-4">
     <h3 class="mb-4">
       <i class="bi bi-card-list me-2"></i>
       New Category
     </h3>
+
     <form @submit.prevent="saveCategory">
        <div class="row mb-3">
           <!-- Category Name -->
               <label for="category" class="form-label">
-                <i class="bi bi-box me-2"></i>Category
+                <i class="bi bi-tags me-2"></i>Category
               </label>
               <input
                 type="text"

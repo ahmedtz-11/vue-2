@@ -1,42 +1,38 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useProductStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/product.js';
-import { useUserStore } from '/home/ahmed/Documents/vue-projects/vue-2/src/stores/user.js';
-import { useSalesStore } from '@/stores/sales';
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useProductStore } from "/home/ahmed/Documents/vue-projects/vue-2/src/stores/product.js";
+import { useUserStore } from "/home/ahmed/Documents/vue-projects/vue-2/src/stores/user.js";
+import { useSalesStore } from "@/stores/sales";
+import Alert from "@/components/Alert.vue";
 
 const userStore = useUserStore();
 const productStore = useProductStore();
 const salesStore = useSalesStore();
+
+const currentPage = ref(1);
+const itemsPerPage = ref(4);
 const router = useRouter();
 const selectedProducts = ref([]);
-const searchQuery = ref('');
-const selectedPaymentMethod = ref('');
-const selectedPaymentStatus = ref('');
+const selectedPaymentMethod = ref("");
+const selectedPaymentStatus = ref("");
 
-// Fetch products and loggedIn user when the component is loaded
-onMounted(async () => {
-  try {
-    await productStore.fetchProducts();
-    await userStore.fetchLoggedInUser();
-  } catch (error) {
-    console.error('Error loading products:', error);
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return productStore.filteredProducts.slice(start, end);
+});
+
+const totalPages = computed(() =>
+  Math.ceil(productStore.filteredProducts.length / itemsPerPage.value)
+);
+
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
   }
-});
+};
 
-// Filtered products based on search query
-const filteredProducts = computed(() => {
-  return productStore.products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
-
-// Display only 4 products, other products will be displayed when searched
-const limitedProducts = computed(() => {
-  return searchQuery.value? filteredProducts.value : filteredProducts.value.slice(0, 4);
-})
-
-// Calculate total amount for the transaction
 const totalAmount = computed(() => {
   return selectedProducts.value
     .reduce((acc, item) => acc + item.quantity * Number(item.product.price), 0)
@@ -73,12 +69,12 @@ const completeTransaction = async () => {
     payment_method: selectedPaymentMethod.value,
     payment_status: selectedPaymentStatus.value,
     sold_by: userStore.username,
-    sales_details: selectedProducts.value.map(item => ({
+    sales_details: selectedProducts.value.map((item) => ({
       product_id: item.product.id,
       quantity: item.quantity,
       unit_price: item.product.price,
-      total_price: item.quantity * item.product.price
-    }))
+      total_price: item.quantity * item.product.price,
+    })),
   };
 
   await salesStore.createTransaction(transaction);
@@ -86,52 +82,51 @@ const completeTransaction = async () => {
 };
 
 const viewTransactions = () => {
-  router.push('/transaction-list');
+  router.push("/transaction-list");
 };
+
+// Fetch products and loggedIn user when the component is loaded
+onMounted(async () => {
+  try {
+    await productStore.fetchProducts();
+    await userStore.fetchLoggedInUser();
+  } catch (error) {
+    console.error("Error loading products:", error);
+  }
+});
 </script>
 
 <template>
+  <Alert
+    :message="productStore.alertMessage"
+    :type="productStore.alertType"
+    :show="productStore.showAlert"
+    @close="productStore.showAlert = false"
+  />
+
   <div class="card p-3">
     <h3 class="mb-4"><i class="bi bi-cash-coin me-2"></i>Sales Transaction</h3>
-
-    <!-- Search and Button Section -->
+    <!-- Search and Button -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="input-group w-50">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
           type="text"
-          v-model="searchQuery"
+          v-model="productStore.searchQuery"
           placeholder="Search for products..."
           class="form-control"
         />
       </div>
-      <button @click="viewTransactions" class="btn btn-primary btn-md">
+      <button @click="viewTransactions" class="btn btn-secondary btn-md">
         <i class="bi bi-clipboard me-2"></i>List Of Transactions
       </button>
     </div>
-
     <!-- Product Selection -->
-    <div class="mb-4">
+    <div class="mb-2">
       <h4 class="text-secondary">Select Products</h4>
-      <!-- Bootstrap Alert -->
+      <div class="row g-3 mt-1">
         <div
-          v-if="productStore.showAlert"
-          class="alert alert-dismissible"
-          :class="`alert-${productStore.alertType}`"
-          role="alert"
-        >
-          {{ productStore.alertMessage }}
-          <button
-            type="button"
-            class="btn-close"
-            aria-label="Close"
-            @click="productStore.showAlert = false"
-          ></button>
-        </div>
-
-      <div class="row g-3 mt-2">
-        <div
-          v-for="product in limitedProducts"
+          v-for="product in paginatedProducts"
           :key="product.id"
           class="col-6 col-md-4 col-lg-3"
         >
@@ -142,13 +137,31 @@ const viewTransactions = () => {
           >
             <div class="card-body">
               <h5 class="card-title">{{ product.name }}</h5>
-              <p class="card-text">Price: {{ Number(product.price).toFixed(2) }}</p>
+              <p class="card-text">
+                Price: {{ Number(product.price).toFixed(2) }}
+              </p>
             </div>
           </div>
         </div>
       </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <button
+          class="btn btn-secondary"
+          :disabled="currentPage === 1"
+          @click="changePage(currentPage - 1)"
+        >
+          <i class="bi bi-chevron-bar-left me-1"></i>Previous
+        </button>
+        <button
+          class="btn btn-secondary"
+          :disabled="currentPage === totalPages"
+          @click="changePage(currentPage + 1)"
+        >
+          Next<i class="bi bi-chevron-bar-right ms-1"></i>
+        </button>
+      </div>
     </div>
-
     <!-- Selected Products -->
     <div v-if="selectedProducts.length > 0" class="mb-4">
       <h4 class="text-secondary">Selected Products</h4>
@@ -163,7 +176,11 @@ const viewTransactions = () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in selectedProducts" :key="item.product.id" class="text-capitalize">
+          <tr
+            v-for="(item, index) in selectedProducts"
+            :key="item.product.id"
+            class="text-capitalize"
+          >
             <td>{{ item.product.name }}</td>
             <td>
               <input
@@ -175,25 +192,32 @@ const viewTransactions = () => {
               />
             </td>
             <td>{{ Number(item.product.price).toFixed(2) }}</td>
-            <td>{{ (item.quantity * Number(item.product.price)).toFixed(2) }}</td>
+            <td>
+              {{ (item.quantity * Number(item.product.price)).toFixed(2) }}
+            </td>
             <td>
               <button
                 class="btn btn-outline-danger btn-sm"
                 @click="removeProduct(index)"
               >
-              <i class="bi bi-trash"></i>
+                <i class="bi bi-trash"></i>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
     <!-- Payment Information -->
     <div v-if="selectedProducts.length > 0" class="row g-3 mb-4">
       <div class="col-md-4">
-        <label for="paymentMethod" class="form-label"><i class="bi bi-wallet2 me-2"></i>Payment Method</label>
-        <select id="paymentMethod" v-model="selectedPaymentMethod" class="form-select">
+        <label for="paymentMethod" class="form-label"
+          ><i class="bi bi-wallet2 me-2"></i>Payment Method</label
+        >
+        <select
+          id="paymentMethod"
+          v-model="selectedPaymentMethod"
+          class="form-select"
+        >
           <option value="" disabled>Select a method</option>
           <option value="cash">Cash</option>
           <option value="credit">Credit</option>
@@ -201,8 +225,14 @@ const viewTransactions = () => {
         </select>
       </div>
       <div class="col-md-4">
-        <label for="paymentStatus" class="form-label"><i class="bi bi-info-circle me-2"></i>Payment Status</label>
-        <select id="paymentStatus" v-model="selectedPaymentStatus" class="form-select">
+        <label for="paymentStatus" class="form-label"
+          ><i class="bi bi-info-circle me-2"></i>Payment Status</label
+        >
+        <select
+          id="paymentStatus"
+          v-model="selectedPaymentStatus"
+          class="form-select"
+        >
           <option value="" disabled>Select a status</option>
           <option value="paid">Paid</option>
           <option value="pending">Pending</option>
@@ -210,30 +240,32 @@ const viewTransactions = () => {
         </select>
       </div>
       <div class="col-md-4">
-        <label for="soldBy" class="form-label"><i class="bi bi-person me-2"></i>Sold By</label>
+        <label for="soldBy" class="form-label"
+          ><i class="bi bi-person me-2"></i>Sold By</label
+        >
         <p class="form-control bg-light">{{ userStore.username }}</p>
       </div>
     </div>
-
     <!-- Total Amount & Complete Transaction -->
     <div class="d-flex justify-content-between mb-2">
-          <h4 class="d-flex" v-if="selectedProducts.length > 0">
-            Total Amount:<span class="text-success fw-bold ms-1">{{ totalAmount }} Tsh.</span>
-          </h4>
-
-          <button @click="completeTransaction" class="btn btn-success btn-md w-50" v-if="selectedProducts.length > 0">
-            <i class="bi bi-save me-2"></i>Complete Transaction
-          </button>
-    </div> 
+      <h4 class="d-flex" v-if="selectedProducts.length > 0">
+        Total Amount:<span class="text-success fw-bold ms-1"
+          >{{ totalAmount }} Tsh.</span
+        >
+      </h4>
+      <button
+        @click="completeTransaction"
+        class="btn btn-success btn-md w-50"
+        v-if="selectedProducts.length > 0"
+      >
+        <i class="bi bi-save me-2"></i>Complete Transaction
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-
 #product-card:hover {
-  border-color: #007bff;
+  border-color: #171818;
 }
 </style>
-
-
-
