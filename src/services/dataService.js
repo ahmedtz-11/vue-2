@@ -25,6 +25,10 @@ class DataService {
     });
   };
 
+  changePin = (id, data) => {
+    return http.put(`/users/changePin.php?id=${id}`, data);
+  };
+
   //PRODUCTS ENDPOINTS
   getProductById = (id) => {
     return http.get(`/products/getSingleProduct.php?id=${id}`);

@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
       sessionStorage.setItem("auth", "true");
       sessionStorage.setItem(
         "user",
-        JSON.stringify({ username: values.username })
+        JSON.stringify({ username: values.username, id: response.data.id }) 
       );
       router.push("/layout");
     } else {

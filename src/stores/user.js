@@ -7,6 +7,7 @@ export const useUserStore = defineStore("user", {
     alertType: "info",
     showAlert: false,
     username: "",
+    userId: "",
     users: [],
   }),
   actions: {
@@ -14,6 +15,7 @@ export const useUserStore = defineStore("user", {
     fetchLoggedInUser() {
       const user = JSON.parse(sessionStorage.getItem("user"));
       this.username = user?.username || "Unknown";
+      this.userId = user?.id || null;
     },
 
     //get all registered users
@@ -35,7 +37,7 @@ export const useUserStore = defineStore("user", {
         const response = isEditing
           ? await dataService.updateUser(userData.id, userData)
           : await dataService.createUser(userData);
-    
+
         if (response.data.success) {
           await this.fetchUsers();
           this.showAlert = true;
@@ -53,7 +55,21 @@ export const useUserStore = defineStore("user", {
         this.alertType = "danger";
       }
     },
-    
+
+    // Change pin by user ID
+    async changePin(userid, data) {
+      try {
+        const response = await dataService.changePin(userid, data);
+        return response.data; // Ensure the response is returned
+      } catch (error) {
+        console.error("Error changing PIN:", error);
+        return {
+          success: false,
+          error: "An error occurred while changing the PIN.",
+        };
+      }
+    },
+
     //delete user by id
     async deleteUser(id) {
       try {

@@ -164,13 +164,15 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-          <button
-            class="btn btn-dark mt-3"
-            @click="nextStep"
-            :disabled="selectedProducts.length == 0"
-          >
-            Next<i class="bi bi-arrow-right ms-2"></i>
-          </button>
+          <div class="text-end">
+            <button
+              class="btn btn-dark mt-3"
+              @click="nextStep"
+              :disabled="selectedProducts.length == 0"
+            >
+              Next<i class="bi bi-arrow-right ms-2"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Step 2: Review & Adjust Quantity -->
