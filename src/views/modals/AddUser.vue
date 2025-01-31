@@ -100,11 +100,10 @@ onMounted(() => {
       tabindex="-1"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div class="card p-4 w-50">
+      <div class="card p-4 w-50 w-md-75 w-lg-50 overflow-auto">
         <div class="d-flex justify-content-between mb-2">
           <h3>
-            <i class="bi bi-person-plus me-2"></i>
-            {{ isEditing ? "Edit User" : "New User" }}
+            {{ isEditing ? "Edit User" : "Add New User" }}
           </h3>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
@@ -118,7 +117,7 @@ onMounted(() => {
             <input
               type="text"
               id="username"
-              class="form-control"
+              class="form-control form-control-lg"
               :class="{ 'is-invalid': usernameError }"
               v-model="username"
             />
@@ -134,7 +133,7 @@ onMounted(() => {
             <input
               type="password"
               id="password"
-              class="form-control"
+              class="form-control form-control-lg"
               :class="{ 'is-invalid': passwordError }"
               v-model="password"
             />
@@ -142,49 +141,55 @@ onMounted(() => {
               {{ passwordError }}
             </div>
           </div>
-          <!-- Role -->
-          <div class="mb-3">
-            <label for="role" class="form-label">
-              <i class="bi bi-suitcase-lg me-2"></i>Role
-            </label>
-            <select
-              id="role"
-              class="form-select"
-              :class="{ 'is-invalid': roleError }"
-              v-model="role"
-            >
-              <option value="Owner">Owner</option>
-              <option value="Admin">Admin</option>
-              <option value="Cashier 1">Cashier 1</option>
-              <option value="Cashier 2">Cashier 2</option>
-            </select>
-            <div v-if="roleError" class="invalid-feedback">
-              {{ roleError }}
+
+          <div class="row mb-3">
+            <!-- Role -->
+            <div class="col-md-6">
+              <label for="role" class="form-label">
+                <i class="bi bi-suitcase-lg me-2"></i>Role
+              </label>
+              <select
+                id="role"
+                class="form-select form-select-lg"
+                :class="{ 'is-invalid': roleError }"
+                v-model="role"
+              >
+                <option value="Owner">Owner</option>
+                <option value="Admin">Admin</option>
+                <option value="Cashier 1">Cashier 1</option>
+                <option value="Cashier 2">Cashier 2</option>
+              </select>
+              <div v-if="roleError" class="invalid-feedback">
+                {{ roleError }}
+              </div>
+            </div>
+            <!-- Status -->
+            <div class="col-md-6">
+              <label for="status" class="form-label">
+                <i class="bi bi-info-circle me-2"></i>Status
+              </label>
+              <select
+                id="status"
+                class="form-select form-select-lg"
+                :class="{ 'is-invalid': statusError }"
+                v-model="status"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              <div v-if="statusError" class="invalid-feedback">
+                {{ statusError }}
+              </div>
             </div>
           </div>
-          <!-- Status -->
-          <div class="mb-3">
-            <label for="status" class="form-label">
-              <i class="bi bi-info-circle me-2"></i>Status
-            </label>
-            <select
-              id="status"
-              class="form-select"
-              :class="{ 'is-invalid': statusError }"
-              v-model="status"
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-            <div v-if="statusError" class="invalid-feedback">
-              {{ statusError }}
-            </div>
-          </div>
+
           <!-- Button -->
-          <button type="submit" class="btn btn-success w-50">
-            <i class="bi bi-save me-2"></i>
-            {{ isEditing ? "Save Changes" : "Add User" }}
-          </button>
+          <div class="text-end">
+            <button type="submit" class="btn btn-success w-25">
+              <i class="bi bi-save me-2"></i>
+              {{ isEditing ? "Save Changes" : "Add User" }}
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -193,6 +198,6 @@ onMounted(() => {
 
 <style scoped>
 .modal {
-    font-family: "Nunito Sans", serif;
+  font-family: "Nunito Sans", serif;
 }
 </style>

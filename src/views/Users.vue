@@ -8,8 +8,26 @@ import Alert from "@/components/Alert.vue";
 const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
 
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
 const modalData = ref(null);
 const showModal = ref(false);
+
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return userStore.filteredUsers.slice(start, end);
+});
+
+const totalPages = computed(() =>
+  Math.ceil(userStore.filteredUsers.length / itemsPerPage.value)
+);
+
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 
 const closeModal = () => {
   showModal.value = false;
@@ -53,15 +71,30 @@ onMounted(async () => {
   />
 
   <div class="card shadow-sm p-3">
-    <h3 class="mb-3"><i class="bi bi-people me-2"></i>User Management</h3>
+    <!--  Search and Button Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3><i class="bi bi-people me-2"></i>List of Users</h3>
+      <button class="btn btn-secondary btn-md" @click="openAddUserModal">
+        <i class="bi bi-person-plus me-2"></i> New User
+      </button>
+    </div>
 
-    <button class="btn btn-secondary mb-3 w-25" @click="openAddUserModal">
-      <i class="bi bi-plus-circle me-2"></i> New User
-    </button>
-    <h6 class="text-secondary mb-2">
-      <i class="bi bi-list-task me-2"></i>Total Users:
-      {{ dashboardStore.totals.totalUsers }}
-    </h6>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="input-group w-50">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search user..."
+          v-model="userStore.searchQuery"
+        />
+      </div>
+      <h6 class="text-secondary">
+        Total Users:
+        {{ dashboardStore.totals.totalUsers }}
+      </h6>
+    </div>
+
     <!-- Users Table -->
     <table class="table table-hover align-middle fs-5">
       <thead class="table-dark">
@@ -74,7 +107,7 @@ onMounted(async () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in userStore.users" :key="user.id">
+        <tr v-for="user in paginatedUsers" :key="user.id">
           <td>{{ user.username }}</td>
           <td>{{ user.role }}</td>
           <td>
@@ -117,6 +150,23 @@ onMounted(async () => {
         </tr>
       </tbody>
     </table>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center gap-2 mb-1">
+      <button
+        class="btn btn-secondary"
+        :disabled="currentPage === 1"
+        @click="changePage(currentPage - 1)"
+      >
+        <i class="bi bi-chevron-bar-left me-1"></i>Previous
+      </button>
+      <button
+        class="btn btn-secondary"
+        :disabled="currentPage === totalPages"
+        @click="changePage(currentPage + 1)"
+      >
+        Next<i class="bi bi-chevron-bar-right ms-1"></i>
+      </button>
+    </div>
 
     <AddUser v-if="showModal" :user="modalData" @close="closeModal" />
   </div>

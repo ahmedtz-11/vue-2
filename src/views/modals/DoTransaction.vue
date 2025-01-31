@@ -98,9 +98,9 @@ onMounted(async () => {
       class="modal fade show d-flex align-items-center justify-content-center fs-5"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div class="card p-3 w-50">
+      <div class="card p-3 w-50 w-md-75 w-lg-50 overflow-auto">
         <div class="d-flex justify-content-between mb-2">
-          <h3><i class="bi bi-cash-coin me-3"></i>Transaction</h3>
+          <h3>Transaction</h3>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
 

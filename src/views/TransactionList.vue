@@ -12,10 +12,7 @@ const salesStore = useSalesStore();
 const router = useRouter();
 const searchQuery = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 10;
-
-
-
+const itemsPerPage = 5;
 const showModal = ref(false);
 
 const closeModal = () => {
@@ -25,9 +22,6 @@ const closeModal = () => {
 const openTransactionModal = () => {
   showModal.value = true;
 };
-
-
-
 
 onMounted(() => {
   dashboardStore.initializeDashboard();
@@ -71,10 +65,6 @@ const totalPages = computed(() => {
   return Math.ceil(filteredTransactions.value.length / itemsPerPage);
 });
 
-// const goToTransactionPage = () => {
-//   router.push("/transaction");
-// };
-
 // Toggle product list accordion
 const toggleAccordion = (transactionId) => {
   const transactions = Array.isArray(salesStore.transactions)
@@ -101,12 +91,16 @@ const toggleAccordion = (transactionId) => {
     @close="salesStore.showAlert = false"
   />
 
-  <div class="card p-3 shadow-sm">
-    <h3 class="mb-3">
-      <i class="bi bi-clipboard me-2"></i>Transaction History
-    </h3>
+  <div class="card shadow-sm p-3">
     <!--  Search and Button Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3><i class="bi bi-clipboard me-2"></i>Transaction History</h3>
+      <button @click="openTransactionModal" class="btn btn-secondary btn-md">
+        <i class="bi bi-cash-coin me-2"></i>Do Transaction
+      </button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="input-group w-50">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
@@ -116,15 +110,12 @@ const toggleAccordion = (transactionId) => {
           class="form-control"
         />
       </div>
-      <button @click="openTransactionModal" class="btn btn-secondary btn-md">
-        <i class="bi bi-plus-circle me-2"></i>Do Transaction
-      </button>
+      <h6 class="text-secondary">
+        Total Revenue:
+        {{ dashboardStore.totals.totalSales }}
+      </h6>
     </div>
 
-    <h6 class="text-secondary mb-2">
-      <i class="bi bi-list-task me-2"></i>Total Revenue:
-      {{ dashboardStore.totals.totalSales }}
-    </h6>
     <!-- Transactions Table -->
     <table class="table table-striped table-hover">
       <thead class="table-dark">
@@ -217,9 +208,6 @@ const toggleAccordion = (transactionId) => {
       </button>
     </div>
 
-    <DoTransaction
-    v-if="showModal"
-    @close="closeModal"
-    />
+    <DoTransaction v-if="showModal" @close="closeModal" />
   </div>
 </template>

@@ -221,8 +221,8 @@ const confirmDelete = async (id) => {
       await productStore.deleteProduct(id);
       await dashboardStore.initializeDashboard();
     } catch (error) {
-      console.error("Error deleting product:", error)
-    }  
+      console.error("Error deleting product:", error);
+    }
   }
 };
 
@@ -234,16 +234,21 @@ onMounted(() => {
 
 <template>
   <Alert
-      :message="productStore.alertMessage"
-      :type="productStore.alertType"
-      :show="productStore.showAlert"
-      @close="productStore.showAlert = false"
-    />
+    :message="productStore.alertMessage"
+    :type="productStore.alertType"
+    :show="productStore.showAlert"
+    @close="productStore.showAlert = false"
+  />
 
-  <div class="card p-3">
-    <h3 class="mb-3"><i class="bi bi-card-list me-2"></i>List of Products</h3>
-
+  <div class="card shadow-sm p-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3><i class="bi bi-card-list me-2"></i>List of Products</h3>
+      <button class="btn btn-secondary btn-md" @click="openAddProductModal">
+        <i class="bi bi-plus-circle me-1"></i> New Product
+      </button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="input-group w-50">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
@@ -253,15 +258,11 @@ onMounted(() => {
           v-model="productStore.searchQuery"
         />
       </div>
-      <button class="btn btn-secondary btn-md" @click="openAddProductModal">
-        <i class="bi bi-plus-circle me-1"></i> New Product
-      </button>
+      <h6 class="text-secondary">
+        Total Products:
+        {{ dashboardStore.totals.totalProducts }}
+      </h6>
     </div>
-
-    <h6 class="text-secondary mb-2">
-      <i class="bi bi-list-task me-2"></i>Total Products:
-      {{ dashboardStore.totals.totalProducts }}
-    </h6>
 
     <!-- Products Table -->
     <table class="table table-striped text-capitalize fs-5">
@@ -293,21 +294,21 @@ onMounted(() => {
               <button
                 class="btn btn-outline-dark btn-md"
                 @click="openViewProductModal(product)"
-                style="border:none !important"
+                style="border: none !important"
               >
                 <i class="bi bi-eye"></i>
               </button>
               <button
                 class="btn btn-outline-success btn-md"
                 @click="openEditProductModal(product)"
-                style="border:none !important"
+                style="border: none !important"
               >
                 <i class="bi bi-pencil"></i>
               </button>
               <button
                 class="btn btn-outline-danger btn-md"
                 @click="confirmDelete(product.id)"
-                style="border:none !important"
+                style="border: none !important"
               >
                 <i class="bi bi-trash3"></i>
               </button>

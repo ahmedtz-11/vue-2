@@ -58,10 +58,16 @@ onMounted(async () => {
     @close="stockStore.showAlert = false"
   />
 
-  <div class="card p-3">
-    <h3 class="mb-3"><i class="bi-cart4 me-2"></i>List of Stocks</h3>
+  <div class="card shadow-sm p-3">
     <!--  Search and Button Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3><i class="bi-cart4 me-2"></i>List of Stocks</h3>
+      <button class="btn btn-secondary btn-md" @click="openAddStockModal">
+        <i class="bi bi-cart-plus me-2"></i>New Stock
+      </button>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="input-group w-50">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
@@ -71,15 +77,12 @@ onMounted(async () => {
           v-model="stockStore.searchQuery"
         />
       </div>
-      <button class="btn btn-secondary btn-md" @click="openAddStockModal">
-        <i class="bi bi-cart-plus me-2"></i>Add New Stock
-      </button>
-    </div>
-
-    <h6 class="text-secondary mb-2">
-      <i class="bi bi-list-task me-2"></i>Total Stocks:
+      <h6 class="text-secondary">
+      Total Stocks:
       {{ dashboardStore.totals.totalStock }}
     </h6>
+    </div>
+
     <!-- Stocks Table -->
     <table class="table table-striped table-hover text-capitalize fs-5">
       <thead class="table-dark">

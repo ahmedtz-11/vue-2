@@ -11,8 +11,9 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(["close"]);
-
 const productStore = useProductStore();
+const categories = ref([]);
+const statuses = ref(["Available", "Not Available"]);
 
 // Define form fields with Vee-Validate
 const { handleSubmit, resetForm } = useForm({
@@ -36,12 +37,8 @@ const { value: category, errorMessage: categoryError } = useField("category");
 const { value: price, errorMessage: priceError } = useField("price");
 const { value: status, errorMessage: statusError } = useField("status");
 
-const categories = ref([]);
-const statuses = ref(["Available", "Not Available"]);
-
 onMounted(async () => {
   categories.value = await productStore.fetchCategories();
-
   // Populate form if editing a product
   if (props.product) {
     resetForm({
@@ -83,30 +80,55 @@ const closeModal = () => {
       tabindex="-1"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div class="card p-4 w-50">
+      <div class="card p-4 w-50 w-md-75 w-lg-50 overflow-auto">
         <div class="d-flex justify-content-between mb-2">
           <h3>
-            <i class="bi bi-pencil-square me-2"></i>
             {{ product ? "Edit Product" : "Add New Product" }}
           </h3>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
 
         <form @submit.prevent="saveProduct">
-          <!-- Product Name -->
-          <div class="mb-3">
-            <label for="name" class="form-label">
-              <i class="bi bi-box-seam me-2"></i>Product Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              v-model="name"
-              class="form-control"
-              :class="{ 'is-invalid': nameError }"
-            />
-            <div v-if="nameError" class="invalid-feedback">
-              {{ nameError }}
+          <div class="row mb-3">
+            <!-- Product Name -->
+            <div class="col-md-6">
+              <label for="name" class="form-label">
+                <i class="bi bi-box-seam me-2"></i>Product Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                v-model="name"
+                class="form-control form-control-lg"
+                :class="{ 'is-invalid': nameError }"
+              />
+              <div v-if="nameError" class="invalid-feedback">
+                {{ nameError }}
+              </div>
+            </div>
+            <!-- Category -->
+            <div class="col-md-6">
+              <label for="category" class="form-label">
+                <i class="bi bi-tags me-2"></i>Category
+              </label>
+              <select
+                id="category"
+                v-model="category"
+                class="form-select form-select-lg"
+                :class="{ 'is-invalid': categoryError }"
+              >
+                <option value="" disabled>Select a category</option>
+                <option
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  :value="cat.category"
+                >
+                  {{ cat.category }}
+                </option>
+              </select>
+              <div v-if="categoryError" class="invalid-feedback">
+                {{ categoryError }}
+              </div>
             </div>
           </div>
 
@@ -118,7 +140,7 @@ const closeModal = () => {
             <textarea
               id="description"
               v-model="description"
-              class="form-control"
+              class="form-control form-control-lg"
               rows="1"
               :class="{ 'is-invalid': descriptionError }"
             ></textarea>
@@ -127,72 +149,48 @@ const closeModal = () => {
             </div>
           </div>
 
-          <!-- Category -->
-          <div class="mb-3">
-            <label for="category" class="form-label">
-              <i class="bi bi-tags me-2"></i>Category
-            </label>
-            <select
-              id="category"
-              v-model="category"
-              class="form-select"
-              :class="{ 'is-invalid': categoryError }"
-            >
-              <option value="" disabled>Select a category</option>
-              <option
-                v-for="cat in categories"
-                :key="cat.id"
-                :value="cat.category"
+          <div class="row mb-3">
+            <!-- Price -->
+            <div class="col-md-6">
+              <label for="price" class="form-label">
+                <i class="bi bi-cash-coin me-2"></i>Price
+              </label>
+              <input
+                type="number"
+                id="price"
+                v-model="price"
+                class="form-control form-control-lg"
+                :class="{ 'is-invalid': priceError }"
+                min="50"
+              />
+              <div v-if="priceError" class="invalid-feedback">
+                {{ priceError }}
+              </div>
+            </div>
+            <!-- Status -->
+            <div class="col-md-6">
+              <label for="status" class="form-label">
+                <i class="bi bi-info-square me-2"></i>Status
+              </label>
+              <select
+                id="status"
+                v-model="status"
+                class="form-select form-select-lg"
+                :class="{ 'is-invalid': statusError }"
               >
-                {{ cat.category }}
-              </option>
-            </select>
-            <div v-if="categoryError" class="invalid-feedback">
-              {{ categoryError }}
+                <option value="" disabled>Select a status</option>
+                <option v-for="stat in statuses" :key="stat" :value="stat">
+                  {{ stat }}
+                </option>
+              </select>
+              <div v-if="statusError" class="invalid-feedback">
+                {{ statusError }}
+              </div>
             </div>
           </div>
 
-          <!-- Price -->
-          <div class="mb-3">
-            <label for="price" class="form-label">
-              <i class="bi bi-cash-coin me-2"></i>Price
-            </label>
-            <input
-              type="number"
-              id="price"
-              v-model="price"
-              class="form-control"
-              :class="{ 'is-invalid': priceError }"
-              min="50"
-            />
-            <div v-if="priceError" class="invalid-feedback">
-              {{ priceError }}
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div class="mb-3">
-            <label for="status" class="form-label">
-              <i class="bi bi-info-square me-2"></i>Status
-            </label>
-            <select
-              id="status"
-              v-model="status"
-              class="form-select"
-              :class="{ 'is-invalid': statusError }"
-            >
-              <option value="" disabled>Select a status</option>
-              <option v-for="stat in statuses" :key="stat" :value="stat">
-                {{ stat }}
-              </option>
-            </select>
-            <div v-if="statusError" class="invalid-feedback">
-              {{ statusError }}
-            </div>
-          </div>
-
-          <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-success w-50">
+          <div class="text-end">
+            <button type="submit" class="btn btn-success w-25">
               <i class="bi bi-save me-2"></i>
               {{ product ? "Save Changes" : "Add Product" }}
             </button>
@@ -205,7 +203,7 @@ const closeModal = () => {
 
 <style>
 .modal {
-    font-family: "Nunito Sans", serif;
+  font-family: "Nunito Sans", serif;
 }
 /* <!-- <button type="button" class="btn btn-danger" @click="closeModal">
               <i class="bi bi-x-lg me-2"></i>

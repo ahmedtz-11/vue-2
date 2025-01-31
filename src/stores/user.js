@@ -8,8 +8,18 @@ export const useUserStore = defineStore("user", {
     showAlert: false,
     username: "",
     userId: "",
+    searchQuery: "",
     users: [],
   }),
+  getters: {
+    filteredUsers: (state) => {
+      if (!Array.isArray(state.users)) return [];
+      if (!state.searchQuery) return state.users;
+      return state.users.filter((user) =>
+        user.username.toLowerCase().includes(state.searchQuery.toLowerCase())
+      );
+    },
+  },
   actions: {
     //Get logged-in user details
     fetchLoggedInUser() {
@@ -60,7 +70,7 @@ export const useUserStore = defineStore("user", {
     async changePin(userid, data) {
       try {
         const response = await dataService.changePin(userid, data);
-        return response.data; // Ensure the response is returned
+        return response.data;
       } catch (error) {
         console.error("Error changing PIN:", error);
         return {
