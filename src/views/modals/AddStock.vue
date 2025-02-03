@@ -77,124 +77,138 @@ onMounted(async () => {
 <template>
   <teleport to="body">
     <div
-      class="modal fade show d-flex align-items-center justify-content-center fs-5"
+      class="modal fade show"
+      id="stockModal"
       tabindex="-1"
+      aria-labelledby="stockModalLabel"
+      aria-hidden="true"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div
-        class="card p-4 w-50 w-md-75 w-lg-50 overflow-auto"
-      >
-        <div class="d-flex justify-content-between mb-3">
-          <h3>Add New Stock</h3>
-          <button type="button" class="btn-close" @click="closeModal"></button>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h3 class="modal-title" id="stockModalLabel">Add New Stock</h3>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="modal-body fs-5">
+            <form @submit.prevent="addStock">
+              <!-- Product -->
+              <div class="mb-3">
+                <label for="product" class="form-label">
+                  <i class="bi bi-box-seam me-2"></i>Product
+                </label>
+                <select
+                  id="product"
+                  class="form-select form-select-lg"
+                  :class="{ 'is-invalid': productError }"
+                  v-model="product"
+                >
+                  <option value="" disabled>Select a product</option>
+                  <option
+                    v-for="prod in productStore.products"
+                    :key="prod.id"
+                    :value="prod.name"
+                    class="text-capitalize"
+                  >
+                    {{ prod.name }}
+                  </option>
+                </select>
+                <div v-if="productError" class="invalid-feedback">
+                  {{ productError }}
+                </div>
+              </div>
+
+              <div class="row mb-3 g-3">
+                <!-- Quantity -->
+                <div class="col-12 col-md-6">
+                  <label for="quantity" class="form-label">
+                    <i class="bi bi-bag-plus me-2"></i>Quantity
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    class="form-control form-control-lg"
+                    :class="{ 'is-invalid': quantityError }"
+                    v-model="quantity"
+                    min="1"
+                  />
+                  <div v-if="quantityError" class="invalid-feedback">
+                    {{ quantityError }}
+                  </div>
+                </div>
+                <!-- Purchasing Price -->
+                <div class="col-12 col-md-6">
+                  <label for="purchasingPrice" class="form-label">
+                    <i class="bi bi-cash-stack me-2"></i>Purchasing Price
+                  </label>
+                  <input
+                    type="number"
+                    id="purchasingPrice"
+                    class="form-control form-control-lg"
+                    :class="{ 'is-invalid': priceError }"
+                    v-model="purchasingPrice"
+                    min="0"
+                  />
+                  <div v-if="priceError" class="invalid-feedback">
+                    {{ priceError }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3 g-3">
+                <!-- Expiry Date -->
+                <div class="col-12 col-md-6">
+                  <label for="expiryDate" class="form-label">
+                    <i class="bi bi-calendar-minus me-2"></i>Expiry Date
+                  </label>
+                  <input
+                    type="date"
+                    id="expiryDate"
+                    class="form-control form-control-lg"
+                    v-model="expiryDate"
+                    :class="{ 'is-invalid': expiryError }"
+                  />
+                  <div v-if="expiryError" class="invalid-feedback">
+                    {{ expiryError }}
+                  </div>
+                </div>
+                <!-- Added By -->
+                <div class="col-12 col-md-6">
+                  <label for="addedBy" class="form-label">
+                    <i class="bi bi-person me-2"></i>Added By
+                  </label>
+                  <input
+                    type="text"
+                    id="addedBy"
+                    class="form-control form-control-lg"
+                    :value="userStore.username"
+                    disabled
+                  />
+                </div>
+              </div>
+
+              <!-- Button -->
+              <div class="text-end">
+                <button type="submit" class="btn btn-success">
+                  <i class="bi-save me-2"></i> Add Stock
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <form @submit.prevent="addStock">
-          <!-- Product -->
-          <div class="mb-3">
-            <label for="product" class="form-label">
-              <i class="bi bi-box-seam me-2"></i>Product
-            </label>
-            <select
-              id="product"
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': productError }"
-              v-model="product"
-            >
-              <option value="" disabled>Select a product</option>
-              <option
-                v-for="prod in productStore.products"
-                :key="prod.id"
-                :value="prod.name"
-                class="text-capitalize"
-              >
-                {{ prod.name }}
-              </option>
-            </select>
-            <div v-if="productError" class="invalid-feedback">
-              {{ productError }}
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <!-- Quantity -->
-            <div class="col-md-6">
-              <label for="quantity" class="form-label">
-                <i class="bi bi-bag-plus me-2"></i>Quantity
-              </label>
-              <input
-                type="number"
-                id="quantity"
-                class="form-control form-control-lg"
-                :class="{ 'is-invalid': quantityError }"
-                v-model="quantity"
-                min="1"
-              />
-              <div v-if="quantityError" class="invalid-feedback">
-                {{ quantityError }}
-              </div>
-            </div>
-            <!-- Purchasing Price -->
-            <div class="col-md-6">
-              <label for="purchasingPrice" class="form-label">
-                <i class="bi bi-cash-stack me-2"></i>Purchasing Price
-              </label>
-              <input
-                type="number"
-                id="purchasingPrice"
-                class="form-control form-control-lg"
-                :class="{ 'is-invalid': priceError }"
-                v-model="purchasingPrice"
-                min="0"
-              />
-              <div v-if="priceError" class="invalid-feedback">
-                {{ priceError }}
-              </div>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <!-- Expiry Date -->
-            <div class="col-md-6">
-              <label for="expiryDate" class="form-label">
-                <i class="bi bi-calendar-minus me-2"></i>Expiry Date
-              </label>
-              <input
-                type="date"
-                id="expiryDate"
-                class="form-control form-control-lg "
-                v-model="expiryDate"
-                :class="{ 'is-invalid': expiryError }"
-              />
-              <div v-if="expiryError" class="invalid-feedback">
-                {{ expiryError }}
-              </div>
-            </div>
-            <!-- Added By -->
-            <div class="col-md-6">
-              <label for="addedBy" class="form-label">
-                <i class="bi bi-person me-2"></i>Added By
-              </label>
-              <input
-                type="text"
-                id="addedBy"
-                class="form-control form-control-lg"
-                :value="userStore.username"
-                disabled
-              />
-            </div>
-          </div>
-
-          <!-- Button -->
-          <div class="text-end">
-            <button type="submit" class="btn btn-success w-25">
-              <i class="bi-save me-2"></i> Add Stock
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   </teleport>
 </template>
+
+
 
 <style scoped></style>

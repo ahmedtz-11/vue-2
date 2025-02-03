@@ -241,87 +241,99 @@ onMounted(() => {
   />
 
   <div class="card shadow-sm p-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Heading and Add Button -->
+    <div
+      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
+    >
       <h3><i class="bi bi-card-list me-2"></i>List of Products</h3>
-      <button class="btn btn-secondary btn-md" @click="openAddProductModal">
+      <button
+        class="btn btn-secondary btn-md mt-2 mt-md-0"
+        @click="openAddProductModal"
+      >
         <i class="bi bi-plus-circle me-1"></i> New Product
       </button>
     </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="input-group w-50">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search product..."
-          v-model="productStore.searchQuery"
-        />
+    <!-- Search and Total Products -->
+    <div class="row align-items-center mb-3">
+      <div class="col-12 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search product..."
+            v-model="productStore.searchQuery"
+          />
+        </div>
       </div>
-      <h6 class="text-secondary">
-        Total Products:
-        {{ dashboardStore.totals.totalProducts }}
-      </h6>
+      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Products: {{ dashboardStore.totals.totalProducts }}
+        </h6>
+      </div>
     </div>
 
     <!-- Products Table -->
-    <table class="table table-striped text-capitalize fs-5">
-      <thead class="table-dark">
-        <tr>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Price</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in paginatedProducts" :key="product.id">
-          <td>{{ product.name }}</td>
-          <td>{{ product.category }}</td>
-          <td>{{ product.price }}</td>
-          <td
-            :class="
-              product.status === 'Available'
-                ? 'text-success fw-bold'
-                : 'text-danger fw-bold'
-            "
-          >
-            {{ product.status }}
-          </td>
-          <td>
-            <div class="btn-group">
-              <button
-                class="btn btn-outline-dark btn-md"
-                @click="openViewProductModal(product)"
-                style="border: none !important"
-              >
-                <i class="bi bi-eye"></i>
-              </button>
-              <button
-                class="btn btn-outline-success btn-md"
-                @click="openEditProductModal(product)"
-                style="border: none !important"
-              >
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button
-                class="btn btn-outline-danger btn-md"
-                @click="confirmDelete(product.id)"
-                style="border: none !important"
-              >
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="productStore.filteredProducts.length === 0">
-          <td colspan="5" class="text-center text-muted">
-            <i class="bi bi-question-circle me-2"></i>No products found.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped text-capitalize fs-5">
+        <thead class="table-dark">
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="product in paginatedProducts" :key="product.id">
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>{{ product.price }}</td>
+            <td
+              :class="
+                product.status === 'Available'
+                  ? 'text-success fw-bold'
+                  : 'text-danger fw-bold'
+              "
+            >
+              {{ product.status }}
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-outline-dark btn-md"
+                  @click="openViewProductModal(product)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  class="btn btn-outline-success btn-md"
+                  @click="openEditProductModal(product)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-md"
+                  @click="confirmDelete(product.id)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="productStore.filteredProducts.length === 0">
+            <td colspan="5" class="text-center text-muted">
+              <i class="bi bi-question-circle me-2"></i>No products found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Pagination -->
     <div class="d-flex justify-content-center gap-2 mb-1">
       <button

@@ -96,108 +96,117 @@ onMounted(() => {
 <template>
   <teleport to="body">
     <div
-      class="modal fade show d-flex align-items-center justify-content-center fs-5"
+      class="modal fade show"
+      id="userModal"
       tabindex="-1"
+      aria-labelledby="userModalLabel"
+      aria-hidden="true"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div class="card p-4 w-50 w-md-75 w-lg-50 overflow-auto">
-        <div class="d-flex justify-content-between mb-2">
-          <h3>
-            {{ isEditing ? "Edit User" : "Add New User" }}
-          </h3>
-          <button type="button" class="btn-close" @click="closeModal"></button>
-        </div>
-
-        <form @submit.prevent="saveUser">
-          <!-- Username -->
-          <div class="mb-3">
-            <label for="username" class="form-label">
-              <i class="bi bi-person me-2"></i>Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': usernameError }"
-              v-model="username"
-            />
-            <div v-if="usernameError" class="invalid-feedback">
-              {{ usernameError }}
-            </div>
-          </div>
-          <!-- Password -->
-          <div class="mb-3">
-            <label for="password" class="form-label">
-              <i class="bi bi-key me-2"></i>Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': passwordError }"
-              v-model="password"
-            />
-            <div v-if="passwordError" class="invalid-feedback">
-              {{ passwordError }}
-            </div>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h3>
+              {{ isEditing ? "Edit User" : "Add New User" }}
+            </h3>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal"
+            ></button>
           </div>
 
-          <div class="row mb-3">
-            <!-- Role -->
-            <div class="col-md-6">
-              <label for="role" class="form-label">
-                <i class="bi bi-suitcase-lg me-2"></i>Role
-              </label>
-              <select
-                id="role"
-                class="form-select form-select-lg"
-                :class="{ 'is-invalid': roleError }"
-                v-model="role"
-              >
-                <option value="Owner">Owner</option>
-                <option value="Admin">Admin</option>
-                <option value="Cashier 1">Cashier 1</option>
-                <option value="Cashier 2">Cashier 2</option>
-              </select>
-              <div v-if="roleError" class="invalid-feedback">
-                {{ roleError }}
+          <!-- Modal Body -->
+          <div class="modal-body fs-5">
+            <form @submit.prevent="saveUser">
+              <!-- Username -->
+              <div class="mb-3">
+                <label for="username" class="form-label">
+                  <i class="bi bi-person me-2"></i>Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  class="form-control form-control-lg"
+                  :class="{ 'is-invalid': usernameError }"
+                  v-model="username"
+                />
+                <div v-if="usernameError" class="invalid-feedback">
+                  {{ usernameError }}
+                </div>
               </div>
-            </div>
-            <!-- Status -->
-            <div class="col-md-6">
-              <label for="status" class="form-label">
-                <i class="bi bi-info-circle me-2"></i>Status
-              </label>
-              <select
-                id="status"
-                class="form-select form-select-lg"
-                :class="{ 'is-invalid': statusError }"
-                v-model="status"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <div v-if="statusError" class="invalid-feedback">
-                {{ statusError }}
+              <!-- Password -->
+              <div class="mb-3">
+                <label for="password" class="form-label">
+                  <i class="bi bi-key me-2"></i>Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  class="form-control form-control-lg"
+                  :class="{ 'is-invalid': passwordError }"
+                  v-model="password"
+                />
+                <div v-if="passwordError" class="invalid-feedback">
+                  {{ passwordError }}
+                </div>
               </div>
-            </div>
+
+              <div class="row mb-3 g-3">
+                <!-- Role -->
+                <div class="col-12 col-md-6">
+                  <label for="role" class="form-label">
+                    <i class="bi bi-suitcase-lg me-2"></i>Role
+                  </label>
+                  <select
+                    id="role"
+                    class="form-select form-select-lg"
+                    :class="{ 'is-invalid': roleError }"
+                    v-model="role"
+                  >
+                    <option value="Owner">Owner</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Cashier 1">Cashier 1</option>
+                    <option value="Cashier 2">Cashier 2</option>
+                  </select>
+                  <div v-if="roleError" class="invalid-feedback">
+                    {{ roleError }}
+                  </div>
+                </div>
+                <!-- Status -->
+                <div class="col-12 col-md-6">
+                  <label for="status" class="form-label">
+                    <i class="bi bi-info-circle me-2"></i>Status
+                  </label>
+                  <select
+                    id="status"
+                    class="form-select form-select-lg"
+                    :class="{ 'is-invalid': statusError }"
+                    v-model="status"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                  <div v-if="statusError" class="invalid-feedback">
+                    {{ statusError }}
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
 
-          <!-- Button -->
-          <div class="text-end">
-            <button type="submit" class="btn btn-success w-25">
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-save me-2"></i>
               {{ isEditing ? "Save Changes" : "Add User" }}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </teleport>
 </template>
 
-<style scoped>
-.modal {
-  font-family: "Nunito Sans", serif;
-}
-</style>
+<style scoped></style>

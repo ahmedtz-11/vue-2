@@ -59,77 +59,86 @@ onMounted(async () => {
   />
 
   <div class="card shadow-sm p-3">
-    <!--  Search and Button Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Heading and Add Button -->
+    <div
+      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
+    >
       <h3><i class="bi-cart4 me-2"></i>List of Stocks</h3>
-      <button class="btn btn-secondary btn-md" @click="openAddStockModal">
-        <i class="bi bi-cart-plus me-2"></i>New Stock
+      <button class="btn btn-secondary btn-md mt-2 mt-md-0" @click="openAddStockModal">
+        <i class="bi bi-cart-plus me-1"></i>New Stock
       </button>
     </div>
-    
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="input-group w-50">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search stock..."
-          v-model="stockStore.searchQuery"
-        />
+    <!-- Search and Total Stocks -->
+    <div class="row align-items-center mb-3">
+      <div class="col-12 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search stock..."
+            v-model="stockStore.searchQuery"
+          />
+        </div>
       </div>
-      <h6 class="text-secondary">
-      Total Stocks:
-      {{ dashboardStore.totals.totalStock }}
-    </h6>
+      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Stocks:
+          {{ dashboardStore.totals.totalStock }}
+        </h6>
+      </div>
     </div>
 
     <!-- Stocks Table -->
-    <table class="table table-striped table-hover text-capitalize fs-5">
-      <thead class="table-dark">
-        <tr>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Purchasing Price</th>
-          <th>Expiry Date</th>
-          <th>Added By</th>
-          <th>Added At</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="stock in paginatedStocks" :key="stock.id">
-          <td>{{ stock.product_name }}</td>
-          <td>{{ stock.quantity }}</td>
-          <td>{{ stock.purchasing_price }}</td>
-          <td>{{ stock.expiry_date }}</td>
-          <td>{{ stock.added_by }}</td>
-          <td>{{ stock.added_at }}</td>
-          <td>
-            <div class="btn-group">
-              <button
-                class="btn btn-outline-success btn-md"
-                @click="editStock(stock.id)"
-                style="border:none !important"
-              >
-                <i class="bi-pencil"></i>
-              </button>
-              <button
-                class="btn btn-outline-danger btn-md"
-                @click="deleteStock(stock.id)"
-                style="border:none !important"
-              >
-                <i class="bi-trash3"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="paginatedStocks.length === 0">
-          <td colspan="7" class="text-center text-muted">
-            <i class="bi bi-question-circle me-2"></i>No stocks found.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover text-capitalize fs-5">
+        <thead class="table-dark">
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Purchasing Price</th>
+            <th>Expiry Date</th>
+            <th>Added By</th>
+            <th>Added At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="stock in paginatedStocks" :key="stock.id">
+            <td>{{ stock.product_name }}</td>
+            <td>{{ stock.quantity }}</td>
+            <td>{{ stock.purchasing_price }}</td>
+            <td>{{ stock.expiry_date }}</td>
+            <td>{{ stock.added_by }}</td>
+            <td>{{ stock.added_at }}</td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-outline-success btn-md"
+                  @click="editStock(stock.id)"
+                  style="border: none !important"
+                >
+                  <i class="bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-md"
+                  @click="deleteStock(stock.id)"
+                  style="border: none !important"
+                >
+                  <i class="bi-trash3"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="paginatedStocks.length === 0">
+            <td colspan="7" class="text-center text-muted">
+              <i class="bi bi-question-circle me-2"></i>No stocks found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Pagination -->
     <div class="d-flex justify-content-center align-items-center mt-3">
       <button

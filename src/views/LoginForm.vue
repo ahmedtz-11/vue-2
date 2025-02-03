@@ -103,7 +103,7 @@ const onSubmit = handleSubmit(async (values) => {
               type="text"
               id="username"
               v-model="username"
-              class="form-control fs-5"
+              class="form-control form-control-lg"
               :class="{ 'is-invalid': usernameError }"
               style="background-color: rgba(5, 5, 5, 0.3)"
             />
@@ -121,7 +121,7 @@ const onSubmit = handleSubmit(async (values) => {
                 :type="showPassword ? 'text' : 'password'"
                 id="password"
                 v-model="password"
-                class="form-control fs-5"
+                class="form-control form-control-lg"
                 :class="{ 'is-invalid': passwordError }"
                 style="background-color: rgba(5, 5, 5, 0.3)"
               />

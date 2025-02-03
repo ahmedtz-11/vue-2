@@ -92,102 +92,113 @@ const toggleAccordion = (transactionId) => {
   />
 
   <div class="card shadow-sm p-3">
-    <!--  Search and Button Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Heading and Add Button -->
+    <div
+      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
+    >
       <h3><i class="bi bi-clipboard me-2"></i>Transaction History</h3>
-      <button @click="openTransactionModal" class="btn btn-secondary btn-md">
-        <i class="bi bi-cash-coin me-2"></i>Do Transaction
+      <button
+        @click="openTransactionModal"
+        class="btn btn-secondary btn-md mt-2 mt-md-0"
+      >
+        <i class="bi bi-cash-coin me-1"></i>Do Transaction
       </button>
     </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="input-group w-50">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search here..."
-          class="form-control"
-        />
+    <!-- Search and Total Revenue -->
+    <div class="row align-items-center mb-3">
+      <div class="col-12 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search here..."
+            class="form-control"
+          />
+        </div>
       </div>
-      <h6 class="text-secondary">
-        Total Revenue:
-        {{ dashboardStore.totals.totalSales }}
-      </h6>
+      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Revenue:
+          {{ dashboardStore.totals.totalSales }}
+        </h6>
+      </div>
     </div>
 
     <!-- Transactions Table -->
-    <table class="table table-striped table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>Transaction Date</th>
-          <th>Total Amount (Tsh.)</th>
-          <th>Payment Status</th>
-          <th>Sold By</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="transaction in paginatedTransactions"
-          :key="transaction.id"
-          class="text-capitalize"
-        >
-          <td>{{ transaction.transaction_date }}</td>
-          <td>{{ parseFloat(transaction.total_amount).toFixed(2) }}</td>
-          <td>
-            <span
-              :class="{
-                'text-success': transaction.payment_status === 'paid',
-                'text-warning': transaction.payment_status === 'pending',
-                'text-danger': transaction.payment_status === 'cancelled',
-              }"
-              class="fw-bold"
-            >
-              {{ transaction.payment_status }}
-            </span>
-          </td>
-          <td>{{ transaction.sold_by }}</td>
-          <td>
-            <div>
-              <div v-if="transaction.details.length > 1">
-                <button
-                  class="btn btn-outline-dark btn-sm"
-                  @click="toggleAccordion(transaction.transaction_id)"
-                >
-                  {{ transaction.isOpen ? "Hide" : "Show" }}
-                  <i
-                    :class="
-                      transaction.isOpen ? 'bi-chevron-up' : 'bi-chevron-down'
-                    "
-                  ></i>
-                </button>
-                <div v-if="transaction.isOpen" class="mt-2">
-                  <ul class="list-unstyled">
-                    <li
-                      v-for="(product, index) in transaction.details"
-                      :key="index"
-                    >
-                      {{ product.product_name }} : {{ product.quantity }} =
-                      {{
-                        (
-                          parseFloat(product.unit_price) * product.quantity
-                        ).toFixed(2)
-                      }}
-                    </li>
-                  </ul>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Transaction Date</th>
+            <th>Total Amount (Tsh.)</th>
+            <th>Payment Status</th>
+            <th>Sold By</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="transaction in paginatedTransactions"
+            :key="transaction.id"
+            class="text-capitalize"
+          >
+            <td>{{ transaction.transaction_date }}</td>
+            <td>{{ parseFloat(transaction.total_amount).toFixed(2) }}</td>
+            <td>
+              <span
+                :class="{
+                  'text-success': transaction.payment_status === 'paid',
+                  'text-warning': transaction.payment_status === 'pending',
+                  'text-danger': transaction.payment_status === 'cancelled',
+                }"
+                class="fw-bold"
+              >
+                {{ transaction.payment_status }}
+              </span>
+            </td>
+            <td>{{ transaction.sold_by }}</td>
+            <td>
+              <div>
+                <div v-if="transaction.details.length > 1">
+                  <button
+                    class="btn btn-outline-dark btn-sm"
+                    @click="toggleAccordion(transaction.transaction_id)"
+                  >
+                    {{ transaction.isOpen ? "Hide" : "Show" }}
+                    <i
+                      :class="
+                        transaction.isOpen ? 'bi-chevron-up' : 'bi-chevron-down'
+                      "
+                    ></i>
+                  </button>
+                  <div v-if="transaction.isOpen" class="mt-2">
+                    <ul class="list-unstyled">
+                      <li
+                        v-for="(product, index) in transaction.details"
+                        :key="index"
+                      >
+                        {{ product.product_name }} : {{ product.quantity }} =
+                        {{
+                          (
+                            parseFloat(product.unit_price) * product.quantity
+                          ).toFixed(2)
+                        }}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="filteredTransactions.length === 0">
-          <td colspan="6" class="text-center text-muted">
-            <i class="bi bi-question-circle me-2"></i>No transactions found.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+          </tr>
+          <tr v-if="filteredTransactions.length === 0">
+            <td colspan="6" class="text-center text-muted">
+              <i class="bi bi-question-circle me-2"></i>No transactions found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center align-items-center mt-3">

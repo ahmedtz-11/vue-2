@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
-import Alert from "@/components/Alert.vue";
+// import Alert from "@/components/Alert.vue";
 
 const showAlert = ref(false);
 const alertMessage = ref("");
@@ -88,88 +88,97 @@ onMounted(() => {
 
 <template>
   <teleport to="body">
-    <Alert
+    <!-- <Alert
       :message="alertMessage"
       :type="alertType"
       :show="showAlert"
       @close="showAlert = false"
-    />
+    /> -->
     <div
-      class="modal fade show d-flex align-items-center justify-content-center fs-5"
+      class="modal fade show"
       tabindex="-1"
+      id="changePasswordModal"
+      aria-labelledby="changePasswordModalLabel"
+      aria-hidden="true"
       style="display: block; background: rgba(0, 0, 0, 0.7)"
     >
-      <div class="card p-4 w-50 w-md-75 w-lg-50 overflow-auto">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="mb-0">Change Password</h4>
-          <button type="button" class="btn-close" @click="closeModal"></button>
-        </div>
-
-        <!-- Form -->
-        <form @submit.prevent="changePin">
-          <div class="mb-3">
-            <label for="oldPin" class="form-label">
-              <i class="bi bi-database-lock me-2"></i> Current Password
-            </label>
-            <input
-              type="password"
-              class="form-control form-control-lg"
-              v-model="oldPin"
-              :class="{ 'is-invalid': oldPinError }"
-            />
-            <div v-if="oldPinError" class="invalid-feedback">
-              {{ oldPinError }}
-            </div>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h3 class="modal-title" id="changePasswordModalLabel">Change Password</h3>
+            <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
           </div>
 
-          <div class="mb-3">
-            <label for="newPin" class="form-label">
-              <i class="bi bi-shield-lock me-2"></i> New Password
-            </label>
-            <div class="input-group">
-              <input
-                :type="showPassword ? 'text' : 'password'"
-                class="form-control form-control-lg"
-                v-model="newPin"
-                :class="{ 'is-invalid': newPinError }"
-              />
-              <button
-                type="button"
-                class="btn btn-dark"
-                @click="togglePasswordVisibility"
-              >
-                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </button>
-            </div>
-            <div v-if="newPinError" class="invalid-feedback">
-              {{ newPinError }}
-            </div>
+          <!-- Modal Body -->
+          <div class="modal-body fs-5">
+            <form @submit.prevent="changePin">
+              <div class="mb-3">
+                <label for="oldPin" class="form-label">
+                  <i class="bi bi-database-lock me-2"></i> Current Password
+                </label>
+                <input
+                  type="password"
+                  class="form-control form-control-lg"
+                  v-model="oldPin"
+                  :class="{ 'is-invalid': oldPinError }"
+                />
+                <div v-if="oldPinError" class="invalid-feedback">
+                  {{ oldPinError }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="newPin" class="form-label">
+                  <i class="bi bi-shield-lock me-2"></i> New Password
+                </label>
+                <div class="input-group">
+                  <input
+                    :type="showPassword ? 'text' : 'password'"
+                    class="form-control form-control-lg"
+                    v-model="newPin"
+                    :class="{ 'is-invalid': newPinError }"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-dark"
+                    @click="togglePasswordVisibility"
+                  >
+                    <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+                <div v-if="newPinError" class="invalid-feedback">
+                  {{ newPinError }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmPin" class="form-label">
+                  <i class="bi bi-shield-lock-fill me-2"></i> Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  class="form-control form-control-lg"
+                  v-model="confirmPin"
+                  :class="{ 'is-invalid': confirmPinError }"
+                />
+                <div v-if="confirmPinError" class="invalid-feedback">
+                  {{ confirmPinError }}
+                </div>
+              </div>
+            </form>
           </div>
 
-          <div class="mb-3">
-            <label for="confirmPin" class="form-label">
-              <i class="bi bi-shield-lock-fill me-2"></i> Confirm New Password
-            </label>
-            <input
-              type="password"
-              class="form-control form-control-lg"
-              v-model="confirmPin"
-              :class="{ 'is-invalid': confirmPinError }"
-            />
-            <div v-if="confirmPinError" class="invalid-feedback">
-              {{ confirmPinError }}
-            </div>
-          </div>
-
-          <!-- Button -->
-          <div class="text-end">
-            <button type="submit" class="btn btn-success w-25 w-sm-100">
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success" @click="changePin">
               <i class="bi bi-save me-2"></i> Update Password
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </teleport>
 </template>
+
+

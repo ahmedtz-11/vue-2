@@ -71,85 +71,97 @@ onMounted(async () => {
   />
 
   <div class="card shadow-sm p-3">
-    <!--  Search and Button Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Heading and Add Button -->
+    <div
+      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
+    >
       <h3><i class="bi bi-people me-2"></i>List of Users</h3>
-      <button class="btn btn-secondary btn-md" @click="openAddUserModal">
-        <i class="bi bi-person-plus me-2"></i> New User
+      <button
+        class="btn btn-secondary btn-md mt-2 mt-md-0"
+        @click="openAddUserModal"
+      >
+        <i class="bi bi-person-plus me-1"></i> New User
       </button>
     </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="input-group w-50">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search user..."
-          v-model="userStore.searchQuery"
-        />
+    <!-- Search and Total Users -->
+    <div class="row align-items-center mb-3">
+      <div class="col-12 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search user..."
+            v-model="userStore.searchQuery"
+          />
+        </div>
       </div>
-      <h6 class="text-secondary">
-        Total Users:
-        {{ dashboardStore.totals.totalUsers }}
-      </h6>
+      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Users:
+          {{ dashboardStore.totals.totalUsers }}
+        </h6>
+      </div>
     </div>
 
     <!-- Users Table -->
-    <table class="table table-hover align-middle fs-5">
-      <thead class="table-dark">
-        <tr>
-          <th>Username</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Created At</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in paginatedUsers" :key="user.id">
-          <td>{{ user.username }}</td>
-          <td>{{ user.role }}</td>
-          <td>
-            <span
-              :class="{
-                'text-success': user.status === 'Active',
-                'text-danger': user.status === 'Inactive',
-              }"
-              class="fw-bold"
-            >
-              {{ user.status }}
-            </span>
-          </td>
-          <td>{{ user.createdAt }}</td>
-          <td>
-            <div class="btn-group">
-              <!-- data-bs-toggle="tooltip"
+    <div class="table-responsive">
+      <table class="table table-hover align-middle fs-5">
+        <thead class="table-dark">
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in paginatedUsers" :key="user.id">
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+              <span
+                :class="{
+                  'text-success': user.status === 'Active',
+                  'text-danger': user.status === 'Inactive',
+                }"
+                class="fw-bold"
+              >
+                {{ user.status }}
+              </span>
+            </td>
+            <td>{{ user.createdAt }}</td>
+            <td>
+              <div class="btn-group">
+                <!-- data-bs-toggle="tooltip"
               title="Delete" -->
-              <button
-                class="btn btn-outline-success btn-md"
-                @click="openEditUserModal(user)"
-                style="border: none !important"
-              >
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button
-                class="btn btn-outline-danger btn-md"
-                @click="deleteUser(user.id)"
-                style="border: none !important"
-              >
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="userStore.users.length === 0">
-          <td colspan="5" class="text-center text-muted">
-            <i class="bi bi-info-circle"></i> No users found.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                <button
+                  class="btn btn-outline-success btn-md"
+                  @click="openEditUserModal(user)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-md"
+                  @click="deleteUser(user.id)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="userStore.users.length === 0">
+            <td colspan="5" class="text-center text-muted">
+              <i class="bi bi-info-circle"></i> No users found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Pagination -->
     <div class="d-flex justify-content-center gap-2 mb-1">
       <button
