@@ -255,7 +255,7 @@ onMounted(async () => {
 
           <!-- Modal Footer -->
           <div class="modal-footer">
-            <button v-if="step > 1" class="btn btn-secondary" @click="prevStep">
+            <button v-if="step > 1" class="btn btn-dark" @click="prevStep">
               <i class="bi bi-arrow-left me-2"></i>Back
             </button>
             <button

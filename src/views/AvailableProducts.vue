@@ -23,12 +23,6 @@ const totalPages = computed(() =>
   Math.ceil(productStore.filteredProducts.length / itemsPerPage.value)
 );
 
-const getStatusClass = (status) => {
-  return status === "Available"
-    ? "text-success fw-bold"
-    : "text-danger fw-bold";
-};
-
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
@@ -44,12 +38,13 @@ onMounted(async () => {
 
 <template>
   <div class="card p-3">
-    <h3 class="mb-3">
-      <i class="bi bi-clipboard-check me-2"></i>Available Products
-    </h3>
+    
 
     <!--  Search and Button Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">
+      <i class="bi bi-clipboard-check me-2"></i>Available Products
+    </h3>
       <div class="input-group w-50">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
@@ -60,17 +55,7 @@ onMounted(async () => {
         />
       </div>
     </div>
-    <!-- Totals -->
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h6 class="text-success">
-        <i class="bi bi-check2-circle me-2"></i>Available Products:
-        {{ productStore.availableProducts.length }}
-      </h6>
-      <h6 class="text-secondary">
-        <i class="bi bi-list-task me-2"></i>Total Products:
-        {{ dashboardStore.totals.totalProducts }}
-      </h6>
-    </div>
+    
 
     <!-- Products table -->
     <div class="table-responsive">
@@ -91,10 +76,16 @@ onMounted(async () => {
           >
             <td>{{ product.name }}</td>
             <td>{{ product.description }}</td>
-            <td>{{ product.category }}</td>
+            <td>{{ product.category_name }}</td>
             <td>{{ product.price }}</td>
-            <td :class="getStatusClass(product.status)">
-              {{ product.status }}
+            <td>
+              <span
+                class="badge"
+                :class="
+                  product.product_status === 'Available' ? 'bg-success' : 'bg-danger'
+                "
+                >{{ product.product_status }}</span
+              >
             </td>
           </tr>
           <tr v-if="productStore.filteredProducts.length === 0">
@@ -104,6 +95,13 @@ onMounted(async () => {
           </tr>
         </tbody>
       </table>
+      <!-- Totals -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="text-success">
+        <i class="bi bi-check2-circle me-2"></i>Available Products:
+        {{ productStore.availableProducts.length }}
+      </h6>
+    </div>
     </div>
 
     <!-- Pagination -->

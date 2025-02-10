@@ -1,28 +1,27 @@
 <script setup>
+import { ref, computed, onMounted } from "vue";
 import { useDashboardStore } from "@/stores/dashboard";
-import { useProductStore } from "@/stores/product.js";
-import { computed, onMounted, ref } from "vue";
-import AddProduct from "/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddProduct.vue";
-import ViewProduct from "/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/ViewProduct.vue";
+import { useProductStore } from "@/stores/product";
 import Alert from "@/components/Alert.vue";
+import AddCategory from "./modals/AddCategory.vue";
 
-const productStore = useProductStore();
 const dashboardStore = useDashboardStore();
+const productStore = useProductStore();
 
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(5);
 const showModal = ref(false);
 const modalData = ref(null);
 const currentModal = ref(null);
 
-const paginatedProducts = computed(() => {
+const paginatedCategories = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return productStore.filteredProducts.slice(start, end);
+  return productStore.filteredCategories.slice(start, end);
 });
 
 const totalPages = computed(() =>
-  Math.ceil(productStore.filteredProducts.length / itemsPerPage.value)
+  Math.ceil(productStore.filteredCategories.length / itemsPerPage.value)
 );
 
 const changePage = (page) => {
@@ -36,39 +35,24 @@ const closeModal = () => {
   modalData.value = null;
 };
 
-const openAddProductModal = () => {
+const openAddCategoryModal = () => {
   modalData.value = null;
   showModal.value = true;
   currentModal.value = "add";
 };
 
-const openEditProductModal = (product) => {
-  modalData.value = { ...product };
-  showModal.value = true;
-  currentModal.value = "edit";
-};
-
-const openViewProductModal = (product) => {
-  modalData.value = { ...product };
-  currentModal.value = "view";
-  showModal.value = true;
-};
-
-const confirmDelete = async (id) => {
-  if (confirm("Are you sure you want to delete this product?")) {
-    try {
-      await productStore.deleteProduct(id);
-      await dashboardStore.initializeDashboard();
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  }
-};
-
-onMounted(() => {
-  productStore.fetchProducts();
-  dashboardStore.initializeDashboard();
+onMounted(async () => {
+  await dashboardStore.initializeDashboard();
+  await productStore.fetchCategories();
 });
+
+const saveCategory = async () => {
+  const categoryData = {
+    category: category.value,
+  };
+
+  await productStore.newCategory(categoryData);
+};
 </script>
 
 <template>
@@ -78,24 +62,50 @@ onMounted(() => {
     :show="productStore.showAlert"
     @close="productStore.showAlert = false"
   />
+  <!-- <div class="card shadow p-4">
+    <h3 class="mb-4">
+      <i class="bi bi-tags me-2"s></i>
+      Categories
+    </h3>
+
+    <form @submit.prevent="saveCategory">
+       <div class="row mb-3">
+          Category Name
+              <label for="category" class="form-label">
+                <i class="bi bi-tags me-2"></i>Category
+              </label>
+              <input
+                type="text"
+                id="category"
+                class="form-control w-50"
+                v-model="category"
+                required
+              />   
+       </div>
+
+      Action Buttons
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-success d-flex align-items-center">
+          <i class="bi bi-save me-2"></i>
+          Save Category
+        </button>
+      </div>
+    </form>
+  </div> -->
 
   <div class="card shadow-sm p-3">
     <!-- Heading, Search, and Add Button -->
     <div class="row g-3 align-items-center mb-4">
       <div class="col-12 col-md-auto text-center text-md-start mb-3 mb-md-0">
-        <h3 class="mb-0">
-          <i class="bi bi-card-list me-2"></i>List of Products
-        </h3>
+        <h3 class="mb-0"><i class="bi bi-tags me-2"></i>Products Categories</h3>
       </div>
       <div class="col-12 col-md flex-grow-1 order-md-1 order-2">
         <div class="input-group">
-          <span class="input-group-text"
-            ><i class="bi bi-search"></i
-          ></span>
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input
             type="text"
             class="form-control"
-            placeholder="Search product..."
+            placeholder="Search category..."
             v-model="productStore.searchQuery"
           />
         </div>
@@ -105,9 +115,9 @@ onMounted(() => {
       >
         <button
           class="btn btn-secondary btn-md w-100 w-md-auto"
-          @click="openAddProductModal"
+          @click="openAddCategoryModal"
         >
-          <i class="bi bi-plus-circle me-1"></i> New Product
+          <i class="bi bi-plus-circle me-1"></i> New Category
         </button>
       </div>
     </div>
@@ -118,45 +128,34 @@ onMounted(() => {
         <thead class="table-dark">
           <tr>
             <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="product in paginatedProducts" :key="product.id">
-            <td>{{ product.name }}</td>
-            <td>{{ product.category_name }}</td>
-            <td>{{ product.price }}</td>
+          <tr v-for="category in paginatedCategories" :key="category.id">
+            <td>{{ category.name }}</td>
             <td>
               <span
                 class="badge"
                 :class="
-                  product.product_status === 'Available' ? 'bg-success' : 'bg-danger'
+                  category.status_name == 'Active' ? 'bg-success' : 'bg-danger'
                 "
-                >{{ product.product_status }}</span
+                >{{ category.status_name }}</span
               >
             </td>
             <td>
               <div class="btn-group">
                 <button
-                  class="btn btn-outline-dark btn-md"
-                  @click="openViewProductModal(product)"
-                  style="border: none !important"
-                >
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button
                   class="btn btn-outline-success btn-md"
-                  @click="openEditProductModal(product)"
+                  @click="openEditProductModal(category)"
                   style="border: none !important"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button
                   class="btn btn-outline-danger btn-md"
-                  @click="confirmDelete(product.id)"
+                  @click="confirmDelete(category.id)"
                   style="border: none !important"
                 >
                   <i class="bi bi-trash3"></i>
@@ -164,17 +163,17 @@ onMounted(() => {
               </div>
             </td>
           </tr>
-          <tr v-if="productStore.filteredProducts.length === 0">
-            <td colspan="5" class="text-center text-muted">
-              <i class="bi bi-question-circle me-2"></i>No products found.
+          <tr v-if="productStore.filteredCategories.length === 0">
+            <td colspan="3" class="text-center text-muted">
+              <i class="bi bi-question-circle me-2"></i>No category found.
             </td>
           </tr>
         </tbody>
       </table>
-      <!-- Total Products -->
+      <!-- Total Categories -->
       <div class="col-12 col-md-auto mt-2 mt-md-0">
         <h6 class="text-muted">
-          Total Products: {{ dashboardStore.totals.totalProducts }}
+          Total Categories: {{ dashboardStore.totals.totalCategories }}
         </h6>
       </div>
     </div>
@@ -197,14 +196,8 @@ onMounted(() => {
       </button>
     </div>
 
-    <AddProduct
+    <AddCategory
       v-if="(currentModal === 'add' || currentModal === 'edit') && showModal"
-      :product="modalData"
-      @close="closeModal"
-    />
-
-    <ViewProduct
-      v-if="currentModal === 'view' && showModal"
       :product="modalData"
       @close="closeModal"
     />

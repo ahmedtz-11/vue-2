@@ -71,21 +71,12 @@ onMounted(async () => {
   />
 
   <div class="card shadow-sm p-3">
-    <!-- Heading and Add Button -->
-    <div
-      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
-    >
-      <h3><i class="bi bi-people me-2"></i>List of Users</h3>
-      <button
-        class="btn btn-secondary btn-md mt-2 mt-md-0"
-        @click="openAddUserModal"
-      >
-        <i class="bi bi-person-plus me-1"></i> New User
-      </button>
-    </div>
-    <!-- Search and Total Users -->
-    <div class="row align-items-center mb-3">
-      <div class="col-12 col-md-6">
+    <!-- Heading, Search and Add Button -->
+    <div class="row g-3 align-items-center mb-4">
+      <div class="col-12 col-md-auto text-center text-md-start mb-3 mb-md-0">
+        <h3 class="mb-0"><i class="bi bi-people me-2"></i>List of Users</h3>
+      </div>
+      <div class="col-12 col-md flex-grow-1 order-md-1 order-2">
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input
@@ -96,11 +87,15 @@ onMounted(async () => {
           />
         </div>
       </div>
-      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
-        <h6 class="text-muted">
-          Total Users:
-          {{ dashboardStore.totals.totalUsers }}
-        </h6>
+      <div
+        class="col-12 col-md-auto text-center text-md-end order-md-2 order-1 mb-3 mb-md-0"
+      >
+        <button
+          class="btn btn-secondary btn-md w-100 w-md-auto"
+          @click="openAddUserModal"
+        >
+          <i class="bi bi-person-plus me-1"></i> New User
+        </button>
       </div>
     </div>
 
@@ -123,19 +118,17 @@ onMounted(async () => {
             <td>
               <span
                 :class="{
-                  'text-success': user.status === 'Active',
-                  'text-danger': user.status === 'Inactive',
+                  'bg-success': user.status_name === 'Active',
+                  'bg-danger': user.status_name === 'Inactive',
                 }"
-                class="fw-bold"
+                class="badge"
               >
-                {{ user.status }}
+                {{ user.status_name }}
               </span>
             </td>
             <td>{{ user.createdAt }}</td>
             <td>
               <div class="btn-group">
-                <!-- data-bs-toggle="tooltip"
-              title="Delete" -->
                 <button
                   class="btn btn-outline-success btn-md"
                   @click="openEditUserModal(user)"
@@ -160,6 +153,13 @@ onMounted(async () => {
           </tr>
         </tbody>
       </table>
+      <!-- Total Users -->
+      <div class="col-12 col-md-auto mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Users:
+          {{ dashboardStore.totals.totalUsers }}
+        </h6>
+      </div>
     </div>
 
     <!-- Pagination -->

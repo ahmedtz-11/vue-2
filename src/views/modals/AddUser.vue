@@ -46,7 +46,7 @@ const populateForm = () => {
     username.value = props.user.username;
     password.value = props.user.password;
     role.value = props.user.role;
-    status.value = props.user.status;
+    status.value = props.user.status_name;
     isEditing.value = true;
   } else {
     resetForm();

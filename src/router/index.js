@@ -1,5 +1,5 @@
 import AddStock from '/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddStock.vue';
-import AddCategory from '@/views/AddCategory.vue';
+import Category from '@/views/Category.vue';
 import AvailableProducts from '@/views/AvailableProducts.vue';
 import Sales from '@/views/Sales.vue';
 import Stock from '@/views/Stock.vue';
@@ -26,7 +26,7 @@ const routes = [
       { path: '/products', component: Products },
       { path: '/available-products', component: AvailableProducts },
       { path: '/unavailable-products', component: UnavailableProducts },
-      { path: '/add-category', component: AddCategory },
+      { path: '/category', component: Category },
       { path: '/stocks', component: Stock },
       {
         path: '/add-product/:id?',

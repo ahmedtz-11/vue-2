@@ -3,11 +3,7 @@ import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
-// import Alert from "@/components/Alert.vue";
 
-const showAlert = ref(false);
-const alertMessage = ref("");
-const alertType = ref("danger");
 const userStore = useUserStore();
 const showPassword = ref(false);
 const loading = ref(false);
@@ -88,12 +84,6 @@ onMounted(() => {
 
 <template>
   <teleport to="body">
-    <!-- <Alert
-      :message="alertMessage"
-      :type="alertType"
-      :show="showAlert"
-      @close="showAlert = false"
-    /> -->
     <div
       class="modal fade show"
       tabindex="-1"

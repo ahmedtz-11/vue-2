@@ -8,6 +8,7 @@ export const useProductStore = defineStore("product", {
     alertType: "info",
     showAlert: false,
     products: [],
+    categories: [],
     availableProducts: [],
     unavailableProducts: [],
     searchQuery: "",
@@ -25,6 +26,13 @@ export const useProductStore = defineStore("product", {
       if (!state.searchQuery) return state.products;
       return state.products.filter((product) =>
         product.name.toLowerCase().includes(state.searchQuery.toLowerCase())
+      );
+    },
+    filteredCategories: (state) => {
+      if (!Array.isArray(state.categories)) return [];
+      if (!state.searchQuery) return state.categories;
+      return state.categories.filter((category) =>
+        category.name.toLowerCase().includes(state.searchQuery.toLowerCase())
       );
     },
   },
@@ -49,7 +57,7 @@ export const useProductStore = defineStore("product", {
         const response = await dataService.getSplash();
         const allProducts = response?.data?.data?.products || [];
         this.availableProducts = allProducts.filter(
-          (product) => product.status === "Available"
+          (product) => product.product_status === "Available"
         );
         console.log("Available Products:", this.availableProducts);
       } catch (error) {
@@ -66,7 +74,7 @@ export const useProductStore = defineStore("product", {
         const response = await dataService.getSplash();
         const allProducts = response?.data?.data?.products || [];
         this.unavailableProducts = allProducts.filter(
-          (product) => product.status === "Not Available"
+          (product) => product.product_status === "Not Available"
         );
         console.log("Unavailable Products:", this.unavailableProducts);
       } catch (error) {
@@ -146,7 +154,8 @@ export const useProductStore = defineStore("product", {
     async fetchCategories() {
       try {
         const response = await dataService.getSplash();
-        return response?.data?.data?.categories || [];
+        this.categories = response?.data?.data?.categories || [];
+        return this.categories; 
       } catch (error) {
         console.error("Error fetching categories:", error);
         this.alertMessage = "Failed to load categories.";

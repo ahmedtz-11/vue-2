@@ -39,13 +39,14 @@ const { value: status, errorMessage: statusError } = useField("status");
 
 onMounted(async () => {
   categories.value = await productStore.fetchCategories();
+  console.log("Categories: ", categories.value);
   // Populate form if editing a product
   if (props.product) {
     resetForm({
       values: {
         name: props.product.name,
         description: props.product.description,
-        category: props.product.category,
+        category: props.product.category_name,
         price: props.product.price,
         status: props.product.status,
       },
@@ -133,9 +134,9 @@ const closeModal = () => {
                     <option
                       v-for="cat in categories"
                       :key="cat.id"
-                      :value="cat.category"
+                      :value="cat.name"
                     >
-                      {{ cat.category }}
+                      {{ cat.name }}
                     </option>
                   </select>
                   <div v-if="categoryError" class="invalid-feedback">

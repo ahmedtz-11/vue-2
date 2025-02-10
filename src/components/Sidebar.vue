@@ -149,7 +149,7 @@ onMounted(() => {
           href="#"
           @click.prevent="toggleDropdown('other')"
         >
-          <span> <i class="bi bi-folder me-2"></i> Other </span>
+          <span> <i class="bi bi-folder me-2"></i> Extras </span>
           <i
             class="bi"
             :class="
@@ -162,8 +162,8 @@ onMounted(() => {
           class="nav flex-column ms-3"
         >
           <li>
-            <router-link class="nav-link text-white" to="/add-category">
-              Add Category
+            <router-link class="nav-link text-white" to="/category">
+              Categories
             </router-link>
           </li>
         </ul>

@@ -8,6 +8,7 @@ export const useDashboardStore = defineStore('dashboard', {
       totalStock: 0,
       totalSales: 0,
       totalUsers: 0,
+      totalCategories: 0
     },
     transactions: [],
     products: [],
@@ -26,6 +27,7 @@ export const useDashboardStore = defineStore('dashboard', {
     
           // Extract totals
           this.totals.totalProducts = Array.isArray(data.products) ? data.products.length : 0;
+          this.totals.totalCategories = Array.isArray(data.categories) ? data.categories.length : 0;
           this.totals.totalStock = Array.isArray(data.stocks)
             ? data.stocks.reduce((sum, stock) => sum + (stock.quantity || 0), 0)
             : 0;

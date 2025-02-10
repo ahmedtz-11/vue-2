@@ -59,18 +59,12 @@ onMounted(async () => {
   />
 
   <div class="card shadow-sm p-3">
-    <!-- Heading and Add Button -->
-    <div
-      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
-    >
-      <h3><i class="bi-cart4 me-2"></i>List of Stocks</h3>
-      <button class="btn btn-secondary btn-md mt-2 mt-md-0" @click="openAddStockModal">
-        <i class="bi bi-cart-plus me-1"></i>New Stock
-      </button>
-    </div>
-    <!-- Search and Total Stocks -->
-    <div class="row align-items-center mb-3">
-      <div class="col-12 col-md-6">
+    <!-- Heading, Search and Add Button -->
+    <div class="row g-3 align-items-center mb-4">
+      <div class="col-12 col-md-auto text-center text-md-start mb-3 mb-md-0">
+        <h3 class="mb-0"><i class="bi-cart4 me-2"></i>List of Stocks</h3>
+      </div>
+      <div class="col-12 col-md flex-grow-1 order-md-1 order-2">
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input
@@ -81,11 +75,15 @@ onMounted(async () => {
           />
         </div>
       </div>
-      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
-        <h6 class="text-muted">
-          Total Stocks:
-          {{ dashboardStore.totals.totalStock }}
-        </h6>
+      <div
+        class="col-12 col-md-auto text-center text-md-end order-md-2 order-1 mb-3 mb-md-0"
+      >
+        <button
+          class="btn btn-secondary btn-md w-100 w-md-auto"
+          @click="openAddStockModal"
+        >
+          <i class="bi bi-cart-plus me-1"></i>New Stock
+        </button>
       </div>
     </div>
 
@@ -96,10 +94,10 @@ onMounted(async () => {
           <tr>
             <th>Product</th>
             <th>Quantity</th>
-            <th>Purchasing Price</th>
+            <th>Purchased</th>
+            <th>Status</th>
             <th>Expiry Date</th>
             <th>Added By</th>
-            <th>Added At</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -108,9 +106,20 @@ onMounted(async () => {
             <td>{{ stock.product_name }}</td>
             <td>{{ stock.quantity }}</td>
             <td>{{ stock.purchasing_price }}</td>
+            <td>
+              <span
+                class="badge"
+                :class="{
+                  'bg-success': stock.stock_status === 'Available',
+                  'bg-info': stock.stock_status === 'Low Stock',
+                  'bg-warning': stock.stock_status === 'Out of Stock',
+                  'bg-danger': stock.stock_status === 'Expired',
+                }"
+                >{{ stock.stock_status }}</span
+              >
+            </td>
             <td>{{ stock.expiry_date }}</td>
-            <td>{{ stock.added_by }}</td>
-            <td>{{ stock.added_at }}</td>
+            <td>{{ stock.added_by_name }}</td>
             <td>
               <div class="btn-group">
                 <button
@@ -137,6 +146,13 @@ onMounted(async () => {
           </tr>
         </tbody>
       </table>
+      <!-- Total Stocks -->
+      <div class="col-12 col-md-auto mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Stocks:
+          {{ dashboardStore.totals.totalStock }}
+        </h6>
+      </div>
     </div>
 
     <!-- Pagination -->

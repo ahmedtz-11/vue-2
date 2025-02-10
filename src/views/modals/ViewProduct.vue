@@ -73,7 +73,7 @@ const closeModal = () => {
               </div>
               <div class="col-md-3 mb-1">
                 <p class="mb-1 text-muted small">Category</p>
-                <p class="text-dark fw-bold">{{ props.product.category }}</p>
+                <p class="text-dark fw-bold">{{ props.product.category_name }}</p>
               </div>
               <div class="col-md-3 mb-1">
                 <p class="mb-1 text-muted small">Price</p>
@@ -84,12 +84,12 @@ const closeModal = () => {
                 <p
                   class="fw-bold"
                   :class="
-                    props.product.status === 'Available'
+                    props.product.product_status === 'Available'
                       ? 'text-success'
                       : 'text-danger'
                   "
                 >
-                  {{ props.product.status }}
+                  {{ props.product.product_status }}
                 </p>
               </div>
             </div>
@@ -100,7 +100,7 @@ const closeModal = () => {
                 <div
                   class="card bg-light p-2"
                   :class="
-                    props.product.status === 'Available'
+                    props.product.product_status === 'Available'
                       ? 'border-success'
                       : 'border-danger'
                   "

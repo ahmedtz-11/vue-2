@@ -92,21 +92,14 @@ const toggleAccordion = (transactionId) => {
   />
 
   <div class="card shadow-sm p-3">
-    <!-- Heading and Add Button -->
-    <div
-      class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 text-center text-md-start"
-    >
-      <h3><i class="bi bi-clipboard me-2"></i>Transaction History</h3>
-      <button
-        @click="openTransactionModal"
-        class="btn btn-secondary btn-md mt-2 mt-md-0"
-      >
-        <i class="bi bi-cash-coin me-1"></i>Do Transaction
-      </button>
-    </div>
-    <!-- Search and Total Revenue -->
-    <div class="row align-items-center mb-3">
-      <div class="col-12 col-md-6">
+    <!-- Heading, Search and Add Button -->
+    <div class="row g-3 align-items-center mb-4">
+      <div class="col-12 col-md-auto text-center text-md-start mb-3 mb-md-0">
+        <h3 class="mb-0">
+          <i class="bi bi-clipboard me-2"></i>Transaction History
+        </h3>
+      </div>
+      <div class="col-12 col-md flex-grow-1 order-md-1 order-2">
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input
@@ -117,22 +110,27 @@ const toggleAccordion = (transactionId) => {
           />
         </div>
       </div>
-      <div class="col-12 col-md-auto text-md-end text-center mt-2 mt-md-0">
-        <h6 class="text-muted">
-          Total Revenue:
-          {{ dashboardStore.totals.totalSales }}
-        </h6>
+      <div
+        class="col-12 col-md-auto text-center text-md-end order-md-2 order-1 mb-3 mb-md-0"
+      >
+        <button
+          @click="openTransactionModal"
+          class="btn btn-secondary btn-md w-100 w-md-auto"
+        >
+          <i class="bi bi-cash-coin me-1"></i>Do Transaction
+        </button>
       </div>
     </div>
 
     <!-- Transactions Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover fs-5">
         <thead class="table-dark">
           <tr>
             <th>Transaction Date</th>
             <th>Total Amount (Tsh.)</th>
             <th>Payment Status</th>
+            <th>Payment Method</th>
             <th>Sold By</th>
             <th>Details</th>
           </tr>
@@ -147,14 +145,26 @@ const toggleAccordion = (transactionId) => {
             <td>{{ parseFloat(transaction.total_amount).toFixed(2) }}</td>
             <td>
               <span
+                class="badge"
                 :class="{
-                  'text-success': transaction.payment_status === 'paid',
-                  'text-warning': transaction.payment_status === 'pending',
-                  'text-danger': transaction.payment_status === 'cancelled',
+                  'bg-success': transaction.payment_status === 'Paid',
+                  'bg-warning': transaction.payment_status === 'Pending',
+                  'bg-danger': transaction.payment_status === 'Cancelled',
                 }"
-                class="fw-bold"
               >
                 {{ transaction.payment_status }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="badge"
+                :class="{
+                  'bg-primary': transaction.payment_method === 'Cash',
+                  'bg-secondary': transaction.payment_method === 'Credit',
+                  'bg-info': transaction.payment_method === 'Online',
+                }"
+              >
+                {{ transaction.payment_method }}
               </span>
             </td>
             <td>{{ transaction.sold_by }}</td>
@@ -198,6 +208,13 @@ const toggleAccordion = (transactionId) => {
           </tr>
         </tbody>
       </table>
+      <!-- Total Revenue -->
+      <div class="col-12 col-md-auto mt-2 mt-md-0">
+        <h6 class="text-muted">
+          Total Revenue:
+          {{ dashboardStore.totals.totalSales }}
+        </h6>
+      </div>
     </div>
 
     <!-- Pagination -->
