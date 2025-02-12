@@ -53,9 +53,17 @@ class DataService {
     return http.post("/products/addCategory.php", data);
   };
 
+  editCategory = (id, data) => {
+    return http.put(`/products/editCategory.php?id=${id}`, data);
+  };
+
   //STOCK ENDPOINTS
+  newStock = (data) => {
+    return http.post("/stocks/addStock.php", data);
+  };
+
   updateStock = (id, data) => {
-    return http.put(`/stock/updateStock.php?id=${id}`, data);
+    return http.put(`/stocks/editStock.php?id=${id}`, data);
   };
 
   //SALES AND TRANSACTIONS ENDPOINT

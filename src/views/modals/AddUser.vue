@@ -64,7 +64,6 @@ const saveUser = handleSubmit(async (values) => {
   };
   try {
     await userStore.saveUser(userData, isEditing.value);
-    await dashboardStore.initializeDashboard();
     resetForm();
     emit("close");
   } catch (error) {
@@ -90,6 +89,7 @@ watch(
 
 onMounted(() => {
   populateForm();
+  dashboardStore.initializeDashboard();
 });
 </script>
 
@@ -198,7 +198,7 @@ onMounted(() => {
 
           <!-- Modal Footer -->
           <div class="modal-footer">
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success" @click="saveUser">
               <i class="bi bi-save me-2"></i>
               {{ isEditing ? "Save Changes" : "Add User" }}
             </button>

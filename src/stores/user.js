@@ -61,7 +61,7 @@ export const useUserStore = defineStore("user", {
       } catch (error) {
         console.error("Error saving user:", error);
         this.showAlert = true;
-        this.alertMessage = "Failed to save user.";
+        this.alertMessage = error;
         this.alertType = "danger";
       }
     },

@@ -1,15 +1,15 @@
 <script setup>
+// import { useRouter } from "vue-router";
+// const router = useRouter();
 import { useDashboardStore } from "@/stores/dashboard";
 import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import AddStock from "/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddStock.vue";
 import { useStockStore } from "/home/ahmed/Documents/vue-projects/vue-2/src/stores/stock.js";
+import AddStock from "/home/ahmed/Documents/vue-projects/vue-2/src/views/modals/AddStock.vue";
 import Alert from "@/components/Alert.vue";
 
 const dashboardStore = useDashboardStore();
 const stockStore = useStockStore();
 
-const router = useRouter();
 const currentPage = ref(1);
 const pageSize = 5;
 const showModal = ref(false);
@@ -37,11 +37,10 @@ const openAddStockModal = () => {
   currentModal.value = "add";
 };
 
-const deleteStock = async (id) => {
-  const confirmDelete = confirm("Are you sure you want to delete this stock?");
-  if (confirmDelete) {
-    await stockStore.deleteStock(id);
-  }
+const openEditStockModal = (stock) => {
+  modalData.value = { ...stock };
+  showModal.value = true;
+  currentModal.value = "edit";
 };
 
 onMounted(async () => {
@@ -124,14 +123,14 @@ onMounted(async () => {
               <div class="btn-group">
                 <button
                   class="btn btn-outline-success btn-md"
-                  @click="editStock(stock.id)"
+                  @click="openEditStockModal(stock)"
                   style="border: none !important"
                 >
                   <i class="bi-pencil"></i>
                 </button>
                 <button
                   class="btn btn-outline-danger btn-md"
-                  @click="deleteStock(stock.id)"
+                  @click="confirmDelete(stock.id)"
                   style="border: none !important"
                 >
                   <i class="bi-trash3"></i>
@@ -174,8 +173,8 @@ onMounted(async () => {
     </div>
 
     <AddStock
-      v-if="currentModal === 'add' && showModal"
-      :product="modalData"
+      v-if="(currentModal === 'add' || currentModal === 'edit') && showModal"
+      :stock="modalData"
       @close="closeModal"
     />
   </div>

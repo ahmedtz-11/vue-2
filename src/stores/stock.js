@@ -57,29 +57,28 @@ export const useStockStore = defineStore("stockStore", {
       }
     },
 
-    //create new stock
-    async addStock(stockData) {
-      try {
-        const response = await axios.post(
-          "http://localhost:8080/vue-api/stocks/addStock.php",
-          stockData
-        );
-
-        if (response.data.success) {
-          this.showAlert = true;
-          this.alertMessage = "Stock added successfully!";
-          this.alertType = "success";
-          return true;
-        } else {
-          return false;
-        }
-      } catch (error) {
-        console.error("Error adding stock:", error);
-        this.showAlert = true;
-        this.alertMessage = "An error occurred while adding stock.";
-        this.alertType = "danger";
-        return false;
-      }
-    },
+    async addStock(stockData, isEditing) {
+          try {
+            const response = isEditing
+              ? await dataService.updateStock(stockData.id, stockData)
+              : await dataService.newStock(stockData);
+    
+            if (response.data.success) {
+              await this.fetchStocks();
+              this.showAlert = true;
+              this.alertMessage = response.data.message;
+              this.alertType = "success";
+            } else {
+              this.showAlert = true;
+              this.alertMessage = response.data.error || "Operation failed.";
+              this.alertType = "danger";
+            }
+          } catch (error) {
+            console.error("Error saving stock:", error);
+            this.showAlert = true;
+            this.alertMessage = error;
+            this.alertType = "danger";
+          }
+        },
   },
 });

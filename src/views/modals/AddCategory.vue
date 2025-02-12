@@ -3,17 +3,20 @@ import { ref, onMounted } from "vue";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
 import { useProductStore } from "@/stores/product";
+import { useDashboardStore } from "@/stores/dashboard";
 
+const dashboardStore = useDashboardStore();
+const productStore = useProductStore();
 const props = defineProps({
-  product: {
+  category: {
     type: Object,
     default: null,
   },
 });
 const emit = defineEmits(["close"]);
-const productStore = useProductStore();
 const categories = ref([]);
 const statuses = ref(["Active", "Inactive"]);
+const isEditing = ref(false);
 
 // Define form fields with Vee-Validate
 const { handleSubmit, resetForm } = useForm({
@@ -27,34 +30,42 @@ const { handleSubmit, resetForm } = useForm({
 const { value: name, errorMessage: nameError } = useField("name");
 const { value: status, errorMessage: statusError } = useField("status");
 
-onMounted(async () => {
-  categories.value = await productStore.fetchCategories();
-  // Populate form if editing a product
-  if (props.product) {
-    resetForm({
-      values: {
-        name: props.product.name,
-        status: props.product.status,
-      },
-    });
+const populateForm = () => {
+  if (props.category) {
+    name.value = props.category.name;
+    status.value = props.category.status_name;
+    isEditing.value = true;
+  } else {
+    resetForm();
   }
-});
+};
 
 // Handle form submission
 const saveCategory = handleSubmit(async (values) => {
-  const productData = {
-    id: props.product?.id || null,
+  const catData = {
+    id: props.category?.id || null,
     name: values.name,
     status: values.status,
   };
-
-  await productStore.saveProduct(productData);
-  emit("close"); // Notify parent to close the modal
+  try {
+    await productStore.saveCategory(catData, isEditing.value);
+    resetForm();
+    emit("close");
+  } catch (error) {
+    console.error("Error saving category:", error);
+  } 
 });
 
 const closeModal = () => {
   emit("close");
 };
+
+onMounted(async () => {
+  categories.value = await productStore.fetchCategories();
+  populateForm();
+  dashboardStore.initializeDashboard();
+  
+});
 </script>
 
 <template>
@@ -72,7 +83,7 @@ const closeModal = () => {
           <!-- Modal Header -->
           <div class="modal-header">
             <h3 class="modal-title" id="categoryModalLabel">
-              {{ product ? "Edit Category" : "Add New Category" }}
+              {{ category ? "Edit Category" : "Add New Category" }}
             </h3>
             <button
               type="button"
@@ -130,7 +141,7 @@ const closeModal = () => {
           <div class="modal-footer">
             <button type="submit" class="btn btn-success" @click="saveCategory">
               <i class="bi bi-save me-2"></i>
-              {{ product ? "Save Changes" : "Add Category" }}
+              {{ category ? "Save Changes" : "Add Category" }}
             </button>
           </div>
         </div>

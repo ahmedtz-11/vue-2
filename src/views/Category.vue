@@ -2,8 +2,8 @@
 import { ref, computed, onMounted } from "vue";
 import { useDashboardStore } from "@/stores/dashboard";
 import { useProductStore } from "@/stores/product";
-import Alert from "@/components/Alert.vue";
 import AddCategory from "./modals/AddCategory.vue";
+import Alert from "@/components/Alert.vue";
 
 const dashboardStore = useDashboardStore();
 const productStore = useProductStore();
@@ -41,18 +41,17 @@ const openAddCategoryModal = () => {
   currentModal.value = "add";
 };
 
+const openEditCategoryModal = (category) => {
+  modalData.value = { ...category };
+  showModal.value = true;
+  currentModal.value = "edit";
+};
+
+
 onMounted(async () => {
   await dashboardStore.initializeDashboard();
   await productStore.fetchCategories();
 });
-
-const saveCategory = async () => {
-  const categoryData = {
-    category: category.value,
-  };
-
-  await productStore.newCategory(categoryData);
-};
 </script>
 
 <template>
@@ -62,36 +61,6 @@ const saveCategory = async () => {
     :show="productStore.showAlert"
     @close="productStore.showAlert = false"
   />
-  <!-- <div class="card shadow p-4">
-    <h3 class="mb-4">
-      <i class="bi bi-tags me-2"s></i>
-      Categories
-    </h3>
-
-    <form @submit.prevent="saveCategory">
-       <div class="row mb-3">
-          Category Name
-              <label for="category" class="form-label">
-                <i class="bi bi-tags me-2"></i>Category
-              </label>
-              <input
-                type="text"
-                id="category"
-                class="form-control w-50"
-                v-model="category"
-                required
-              />   
-       </div>
-
-      Action Buttons
-      <div class="d-flex justify-content-between mt-4">
-        <button type="submit" class="btn btn-success d-flex align-items-center">
-          <i class="bi bi-save me-2"></i>
-          Save Category
-        </button>
-      </div>
-    </form>
-  </div> -->
 
   <div class="card shadow-sm p-3">
     <!-- Heading, Search, and Add Button -->
@@ -148,17 +117,10 @@ const saveCategory = async () => {
               <div class="btn-group">
                 <button
                   class="btn btn-outline-success btn-md"
-                  @click="openEditProductModal(category)"
+                  @click="openEditCategoryModal(category)"
                   style="border: none !important"
                 >
                   <i class="bi bi-pencil"></i>
-                </button>
-                <button
-                  class="btn btn-outline-danger btn-md"
-                  @click="confirmDelete(category.id)"
-                  style="border: none !important"
-                >
-                  <i class="bi bi-trash3"></i>
                 </button>
               </div>
             </td>
@@ -198,7 +160,7 @@ const saveCategory = async () => {
 
     <AddCategory
       v-if="(currentModal === 'add' || currentModal === 'edit') && showModal"
-      :product="modalData"
+      :category="modalData"
       @close="closeModal"
     />
   </div>

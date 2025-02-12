@@ -12,13 +12,6 @@ export const useProductStore = defineStore("product", {
     availableProducts: [],
     unavailableProducts: [],
     searchQuery: "",
-    currentProduct: {
-      name: "",
-      category: "",
-      price: "",
-      description: "",
-      status: "",
-    }, // Ensure currentProduct is always an object
   }),
   getters: {
     filteredProducts: (state) => {
@@ -85,25 +78,6 @@ export const useProductStore = defineStore("product", {
       }
     },
 
-    //get a single product by id
-    async fetchProductById(id) {
-      try {
-        const response = await dataService.getProductById(id);
-        this.currentProduct = response.data || {
-          name: "",
-          category: "",
-          price: "",
-          description: "",
-          status: "",
-        };
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        this.showAlert = true;
-        this.alertMessage = "Failed to load product details.";
-        this.alertType = "danger";
-      }
-    },
-
     //add new product or edit the existing product
     async saveProduct(productData) {
       const endpoint = productData.id
@@ -165,20 +139,29 @@ export const useProductStore = defineStore("product", {
       }
     },
 
-    // Create new category
-    async newCategory(category) {
-      try {
-        await dataService.newCategory(category);
-        await this.getSplash();
-        this.alertMessage = "New category added.";
-        this.alertType = "success";
-        this.showAlert = true;
-      } catch (error) {
-        console.error("Error creating category:", error);
-        this.alertMessage = "Failed to add category.";
-        this.alertType = "danger";
-        this.showAlert = true;
-      }
-    },
+    // Create new category & Updating
+    async saveCategory(catData, isEditing) {
+          try {
+            const response = isEditing
+              ? await dataService.editCategory(catData.id, catData)
+              : await dataService.newCategory(catData);
+    
+            if (response.data.success) {
+              await this.fetchCategories();
+              this.showAlert = true;
+              this.alertMessage = response.data.message;
+              this.alertType = "success";
+            } else {
+              this.showAlert = true;
+              this.alertMessage = response.data.error || "Operation failed.";
+              this.alertType = "danger";
+            }
+          } catch (error) {
+            console.error("Error saving category:", error);
+            this.showAlert = true;
+            this.alertMessage = error;
+            this.alertType = "danger";
+          }
+        },
   },
 });

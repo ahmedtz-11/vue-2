@@ -17,9 +17,10 @@ const emit = defineEmits(["close"]);
 const productStore = useProductStore();
 const userStore = useUserStore();
 const stockStore = useStockStore();
+const isEditing = ref(false);
 
 // Define form fields with correct validation rules
-const { handleSubmit } = useForm({
+const { handleSubmit, resetForm } = useForm({
   validationSchema: yup.object({
     product: yup.string().required("Product is required"),
     quantity: yup
@@ -36,8 +37,7 @@ const { handleSubmit } = useForm({
       .number()
       .typeError("Price must be a number")
       .required("Price is required")
-      .min(50, "Price must be at least 50"),
-    status: yup.string().required("Status is required"),
+      .min(50, "Price must be at least 50")
   }),
 });
 
@@ -48,19 +48,34 @@ const { value: purchasingPrice, errorMessage: priceError } =
   useField("purchasingPrice");
 const { value: expiryDate, errorMessage: expiryError } = useField("expiryDate");
 
-const addStock = handleSubmit(async (values) => {
+const populateForm = () => {
+  if (props.stock) {
+    product.value = props.stock.product_name;
+    quantity.value = props.stock.quantity;
+    purchasingPrice.value = props.stock.purchasing_price;
+    expiryDate.value = props.stock.expiry_date;
+    isEditing.value = true;
+  } else {
+    resetForm();
+  }
+};
+
+// Handle form submission
+const addNewStock = handleSubmit(async (values) => {
   const stockData = {
-    product_name: product.value,
-    quantity: quantity.value,
-    purchasing_price: purchasingPrice.value,
-    expiry_date: expiryDate.value,
+    id: props.stock?.id || null,
+    product_name: values.product,
+    quantity: values.quantity,
+    purchasing_price: values.purchasingPrice,
+    expiry_date: values.expiryDate,
     added_by: userStore.username,
   };
-
-  const success = await stockStore.addStock(stockData);
-  if (success) {
+  try {
+    await stockStore.addStock(stockData, isEditing.value);
+    resetForm();
     emit("close");
-    stockStore.fetchStocks();
+  } catch (error) {
+    console.error("Error saving stock:", error);
   }
 });
 
@@ -69,8 +84,9 @@ const closeModal = () => {
 };
 
 onMounted(async () => {
-  await productStore.fetchProducts();
-  await userStore.fetchLoggedInUser();
+  productStore.fetchProducts();
+  userStore.fetchLoggedInUser();
+  populateForm();
 });
 </script>
 
@@ -88,7 +104,9 @@ onMounted(async () => {
         <div class="modal-content">
           <!-- Modal Header -->
           <div class="modal-header">
-            <h3 class="modal-title" id="stockModalLabel">Add New Stock</h3>
+            <h3 class="modal-title" id="stockModalLabel">
+              {{ stock ? "Edit Stock" : "Add New Stock" }}
+            </h3>
             <button
               type="button"
               class="btn-close"
@@ -99,7 +117,7 @@ onMounted(async () => {
 
           <!-- Modal Body -->
           <div class="modal-body fs-5">
-            <form @submit.prevent="addStock">
+            <form @submit.prevent="addNewStock">
               <!-- Product -->
               <div class="mb-3">
                 <label for="product" class="form-label">
@@ -197,8 +215,9 @@ onMounted(async () => {
 
               <!-- Button -->
               <div class="text-end">
-                <button type="submit" class="btn btn-success">
-                  <i class="bi-save me-2"></i> Add Stock
+                <button type="submit" class="btn btn-success" @click="addNewStock">
+                  <i class="bi-save me-2"></i>
+                  {{ stock ? "Save Changes" : "Add Stock" }}
                 </button>
               </div>
             </form>
@@ -208,7 +227,5 @@ onMounted(async () => {
     </div>
   </teleport>
 </template>
-
-
 
 <style scoped></style>

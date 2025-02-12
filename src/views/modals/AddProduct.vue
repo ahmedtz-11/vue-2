@@ -48,7 +48,7 @@ onMounted(async () => {
         description: props.product.description,
         category: props.product.category_name,
         price: props.product.price,
-        status: props.product.status,
+        status: props.product.product_status,
       },
     });
   }
