@@ -20,11 +20,11 @@ const selectedPaymentStatus = ref("");
 const paginatedProducts = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return productStore.filteredProducts.slice(start, end);
+  return productStore.filteredProducts2.slice(start, end);
 });
 
 const totalPages = computed(() =>
-  Math.ceil(productStore.filteredProducts.length / itemsPerPage.value)
+  Math.ceil(productStore.filteredProducts2.length / itemsPerPage.value)
 );
 
 const changePage = (page) => {
@@ -87,7 +87,7 @@ const closeModal = () => emit("close");
 
 // Fetch products and loggedIn user when the component is loaded
 onMounted(async () => {
-  await productStore.fetchProducts();
+  await productStore.fetchProductsForSell();
   await userStore.fetchLoggedInUser();
 });
 </script>
@@ -148,7 +148,8 @@ onMounted(async () => {
                   >
                     <div class="card-body">
                       <h5>{{ product.name }}</h5>
-                      <p>Price: {{ Number(product.price).toFixed(2) }}</p>
+                      <p class="text-muted fs-5">Price: {{ $formatMoney(Number(product.price)) }}</p>
+                      <p class="text-primary fs-5">Quantity : {{ product.total_stock }}</p>
                     </div>
                   </div>
                 </div>
@@ -248,7 +249,7 @@ onMounted(async () => {
 
               <h4 class="mt-3">
                 Total Amount:
-                <span class="text-success fw-bold ms-1">{{ totalAmount }} Tsh.</span>
+                <span class="text-success fw-bold ms-1">{{ $formatMoney(totalAmount) }} Tsh.</span>
               </h4>
             </div>
           </div>

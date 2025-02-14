@@ -8,6 +8,7 @@ export const useProductStore = defineStore("product", {
     alertType: "info",
     showAlert: false,
     products: [],
+    products2: [],
     categories: [],
     availableProducts: [],
     unavailableProducts: [],
@@ -17,6 +18,13 @@ export const useProductStore = defineStore("product", {
     filteredProducts: (state) => {
       if (!Array.isArray(state.products)) return [];
       if (!state.searchQuery) return state.products;
+      return state.products.filter((product) =>
+        product.name.toLowerCase().includes(state.searchQuery.toLowerCase())
+      );
+    },
+    filteredProducts2: (state) => {
+      if (!Array.isArray(state.products2)) return [];
+      if (!state.searchQuery) return state.products2;
       return state.products.filter((product) =>
         product.name.toLowerCase().includes(state.searchQuery.toLowerCase())
       );
@@ -36,6 +44,20 @@ export const useProductStore = defineStore("product", {
         const response = await dataService.getSplash();
         this.products = response?.data?.data?.products || [];
         console.log("Products:", this.products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        this.showAlert = true;
+        this.alertMessage = "Failed to load products.";
+        this.alertType = "danger";
+      }
+    },
+
+    //get all products for sell
+    async fetchProductsForSell() {
+      try {
+        const response = await dataService.getSplash();
+        this.products2 = response?.data?.data?.products_forSell || [];
+        console.log("Products:", this.products2);
       } catch (error) {
         console.error("Error fetching products:", error);
         this.showAlert = true;

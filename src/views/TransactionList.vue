@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useDashboardStore } from "@/stores/dashboard";
 import Alert from "@/components/Alert.vue";
 import DoTransaction from "./modals/DoTransaction.vue";
+import ViewTransaction from "./modals/ViewTransaction.vue";
 
 const dashboardStore = useDashboardStore();
 const salesStore = useSalesStore();
@@ -14,6 +15,8 @@ const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 5;
 const showModal = ref(false);
+const modalData = ref(null);
+const currentModal = ref(null);
 
 const closeModal = () => {
   showModal.value = false;
@@ -21,17 +24,18 @@ const closeModal = () => {
 
 const openTransactionModal = () => {
   showModal.value = true;
+  currentModal.value = "add";
+};
+
+const openViewTransactionModal = (transaction) => {
+  modalData.value = { ...transaction };
+  currentModal.value = "view";
+  showModal.value = true;
 };
 
 onMounted(() => {
   dashboardStore.initializeDashboard();
   salesStore.fetchTransactions();
-
-  salesStore.transactions.forEach((transaction) => {
-    if (transaction.details && !("isOpen" in transaction)) {
-      transaction.isOpen = false;
-    }
-  });
 });
 
 // Filtered transactions based on search query
@@ -64,23 +68,6 @@ const paginatedTransactions = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(filteredTransactions.value.length / itemsPerPage);
 });
-
-// Toggle product list accordion
-const toggleAccordion = (transactionId) => {
-  const transactions = Array.isArray(salesStore.transactions)
-    ? salesStore.transactions
-    : Object.values(salesStore.transactions); // Convert to array if it's an object
-
-  const transaction = transactions.find(
-    (t) => t.transaction_id === transactionId
-  );
-  if (transaction) {
-    console.log(
-      `Toggling accordion for transaction ${transactionId}, current state: ${transaction.isOpen}`
-    );
-    transaction.isOpen = !transaction.isOpen;
-  }
-};
 </script>
 
 <template>
@@ -128,11 +115,9 @@ const toggleAccordion = (transactionId) => {
         <thead class="table-dark">
           <tr>
             <th>Transaction Date</th>
-            <th>Total Amount (Tsh.)</th>
             <th>Payment Status</th>
-            <th>Payment Method</th>
             <th>Sold By</th>
-            <th>Details</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -142,7 +127,6 @@ const toggleAccordion = (transactionId) => {
             class="text-capitalize"
           >
             <td>{{ transaction.transaction_date }}</td>
-            <td>{{ parseFloat(transaction.total_amount).toFixed(2) }}</td>
             <td>
               <span
                 class="badge"
@@ -155,49 +139,16 @@ const toggleAccordion = (transactionId) => {
                 {{ transaction.payment_status }}
               </span>
             </td>
-            <td>
-              <span
-                class="badge"
-                :class="{
-                  'bg-primary': transaction.payment_method === 'Cash',
-                  'bg-secondary': transaction.payment_method === 'Credit',
-                  'bg-info': transaction.payment_method === 'Online',
-                }"
-              >
-                {{ transaction.payment_method }}
-              </span>
-            </td>
             <td>{{ transaction.sold_by }}</td>
             <td>
-              <div>
-                <div v-if="transaction.details.length > 1">
-                  <button
-                    class="btn btn-outline-dark btn-sm"
-                    @click="toggleAccordion(transaction.transaction_id)"
-                  >
-                    {{ transaction.isOpen ? "Hide" : "Show" }}
-                    <i
-                      :class="
-                        transaction.isOpen ? 'bi-chevron-up' : 'bi-chevron-down'
-                      "
-                    ></i>
-                  </button>
-                  <div v-if="transaction.isOpen" class="mt-2">
-                    <ul class="list-unstyled">
-                      <li
-                        v-for="(product, index) in transaction.details"
-                        :key="index"
-                      >
-                        {{ product.product_name }} : {{ product.quantity }} =
-                        {{
-                          (
-                            parseFloat(product.unit_price) * product.quantity
-                          ).toFixed(2)
-                        }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+              <div class="btn-group">
+                <button
+                  class="btn btn-outline-dark btn-sm"
+                  @click="openViewTransactionModal(transaction)"
+                  style="border: none !important"
+                >
+                  <i class="bi bi-eye fs-5"></i>
+                </button>
               </div>
             </td>
           </tr>
@@ -212,7 +163,7 @@ const toggleAccordion = (transactionId) => {
       <div class="col-12 col-md-auto mt-2 mt-md-0">
         <h6 class="text-muted">
           Total Revenue:
-          {{ dashboardStore.totals.totalSales }}
+          {{ $formatMoney(dashboardStore.totals.totalSales) }}
         </h6>
       </div>
     </div>
@@ -236,6 +187,14 @@ const toggleAccordion = (transactionId) => {
       </button>
     </div>
 
-    <DoTransaction v-if="showModal" @close="closeModal" />
+    <DoTransaction
+      v-if="currentModal === 'add' && showModal"
+      @close="closeModal"
+    />
+    <ViewTransaction
+      v-if="currentModal === 'view' && showModal"
+      :transaction="modalData"
+      @close="closeModal"
+    />
   </div>
 </template>
